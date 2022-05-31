@@ -7,12 +7,12 @@ Last Edited Time: May 28, 2022 12:21 PM
 
 Classification of one dataset using multivariate data analysis, preprocessing, deep learning/ machine learning techniques
 
-- Dataset 1: **Near Infrared (NIR) Spectroscopy measurements of chicken filets**
+**Dataset 1: Near Infrared (NIR) Spectroscopy measurements of chicken filets**
 
 # Goals
 
 What are the outcomes that will result from these changes? How will we evaluate success for the proposed changes? \
-Primary objective: Classifying the 8 growth conditions of chicken filets
+**Primary objective: Classifying the 8 growth conditions of chicken filets**
 - Preprocessing
 - PCA
 - Model selection
