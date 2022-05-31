@@ -105,4 +105,4 @@ corplot(x=df$X1459.398,y=df$X1465.592,'Correlation plot of most correlated featu
 
 # Defining target variable
 library(gplots)
-??group_by()
+open_simsim
