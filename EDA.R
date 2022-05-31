@@ -6,7 +6,7 @@ pacman::p_load(dplyr,MASS,ggplot2,openxlsx, tidyverse, plotly,ggpubr,reshape2,Hm
 setwd('./')
 df <- data.frame(read.csv('./Chicken Fillet NIR data.csv',
                           strip.white = TRUE,
-                          sep=';',
+                          sep=';', dec=".",
                           stringsAsFactors = TRUE))
 
 head(df)
@@ -105,3 +105,6 @@ corplot(x=df$X1459.398,y=df$X1465.592,'Correlation plot of most correlated featu
 
 # Defining target variable
 library(gplots)
+target <- df$Production_system
+target
+
