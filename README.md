@@ -7,17 +7,18 @@ Last Edited Time: May 28, 2022 12:21 PM
 
 Classification of one dataset using multivariate data analysis, preprocessing, deep learning/ machine learning techniques
 
-- Dataset 1: Organic solvents: Classifying organic solvents
-- Dataset 2: Chicken filets: Classifying the 8 growth conditions of chicken filets
+- Dataset 1: **Near Infrared Spectroscopy measurements of Chicken filets**
 
 # Goals
 
 What are the outcomes that will result from these changes? How will we evaluate success for the proposed changes? 
-
+Primary objective: Classifying the 8 growth conditions of chicken filets
 - Preprocessing
 - PCA
 - Model selection
 - Cross Validation
+- Model Building
+
 - Evaluation metrics
 
 ### Non-Goals
