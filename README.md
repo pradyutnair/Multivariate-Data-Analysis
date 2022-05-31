@@ -11,7 +11,7 @@ Classification of one dataset using multivariate data analysis, preprocessing, d
 
 # Goals
 
-What are the outcomes that will result from these changes? How will we evaluate success for the proposed changes? 
+What are the outcomes that will result from these changes? How will we evaluate success for the proposed changes? /
 Primary objective: Classifying the 8 growth conditions of chicken filets
 - Preprocessing
 - PCA
