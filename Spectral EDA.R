@@ -39,7 +39,8 @@ plot(tp.spec, xlab="",ylab="",col ="Green",
 par(new=TRUE)
 plot(tb.spec, xlab="Wavelength (nm)",ylab="Absorbance", col ="Red",main="Spectroscopic data of fresh chicken fillets"
   ,ylim=c(0.5,3.5))
-
+legend(x="topleft", legend=c("OM", "TB","TP"),
+       col=c("blue", "red","green"), lty=1, cex=0.8)
 plot.spec <- function(word,title){
   if (word == "FR"){
     df <- t(df[df$Freshness=="FR",][5:length(df)])
@@ -102,3 +103,5 @@ plot(tp.spec, xlab="",ylab="",col ="magenta",
 par(new=TRUE)
 plot(tb.spec, xlab="Wavelength (nm)",ylab="Absorbance", col ="black",main="Spectroscopic data of Thawed chicken fillets"
   ,ylim=c(0.5,3.5))
+legend(x="topleft", legend=c("OM", "TB","TP"),
+       col=c("cyan", "black","magenta"), lty=1, cex=0.8)
