@@ -54,14 +54,14 @@ create.spectra <- function(df,type){
 # Function for plotting spectral data
 plot.spectra <- function(om.spec,tb.spec,tp.spec,title,colors){
   # Plot spectral data sequentially
-  plot(om.spec, xlab="",ylab="",col =colors[1],
+  plot(om.spec, xlab="",ylab="",col =colors[1], xlim=c(900,1680),
        ylim=c(0.5,3.5))
   par(new=TRUE)
-  plot(tp.spec, xlab="",ylab="",col =colors[3],
+  plot(tp.spec, xlab="",ylab="",col =colors[3],xlim=c(900,1680),
        ylim=c(0.5,3.5))
   par(new=TRUE)
   plot(tb.spec, xlab="Wavelength (nm)",ylab="Absorbance", col =colors[2],main=title,
-       ylim=c(0.5,3.5))
+       xlim=c(900,1680),ylim=c(0.5,3.5))
   legend(x="topleft", legend=c("OM", "TB","TP"),
          col=c(colors[1],colors[2],colors[3]), lty=1, cex=0.8)
 }
@@ -83,7 +83,7 @@ plot.spectra(om.t,tb.t,tp.t,title="Raw NIR data of thawed chicken fillets",
              colors=c("cyan","black","magenta"))
 
 ###############################################
-# Performing spectral smoothing
+# Perform spectral smoothing
 
 om.f.smooth <- procspec(om.f,opt="smooth",fixneg="none")
 tb.f.smooth <- procspec(tb.f,opt="smooth",fixneg="none")
