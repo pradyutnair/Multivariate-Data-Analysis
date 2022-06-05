@@ -7,7 +7,7 @@ df <- data.frame(read.csv('./Chicken Fillet NIR data.csv',
                           stringsAsFactors = TRUE))
 
 # Remove row 455 as it is most likely a measurement error
-df <- df[-c(455),]
+df <- df[-455,]
 fresh <- df[df$Freshness == "FR",][,5:length(df)]
 thawed <- df[df$Freshness == "TH",][,5:length(df)]
 
