@@ -1,5 +1,5 @@
 library(pacman)
-pacman::p_load(ggplot2, MASS, Hmisc, dplyr, squash, pavo,plyr)
+pacman::p_load(ggplot2, MASS, Hmisc, dplyr, squash, pavo,plyr, caTools,caret,klaR)
 set.seed(123)
 
 ################################################
@@ -101,18 +101,54 @@ plot.spectra(om.f.smooth,tb.f.smooth,tp.f.smooth,title="Smoothed NIR data of fre
 plot.spectra(om.t.smooth,tb.t.smooth,tp.t.smooth,title="Smoothed NIR data of thawed chicken fillets",
                 colors=c("cyan","black","magenta"))
 
+
 ###############################################
 # Linear Discriminant Analysis
+# use 70% of dataset as training set and 30% as test set
+linear.da <- function(df,title){
+  sample <- sample.split(df$Scan_type, SplitRatio = 0.7)
+  train  <- subset(df, sample == TRUE)
+  #test   <- subset(df, sample == FALSE)
 
-y <- fresh$Scan_type
-X <- as.matrix(fresh[,5:length(fresh)])
-typeof(X)
-lda <- lda(y~X)
-attributes(lda)
+  preproc.parameter <- train[,5:length(df)] %>%
+    preProcess(method = c("center", "scale"))
+
+  train.transform <- preproc.parameter %>% predict(train[,5:length(train)])
+  X_train <- as.matrix(train.transform)
+  y_train <- train$Scan_type
+
+  #test.transform <- preproc.parameter %>% predict(test[,5:length(test)])
+  #X_test  <- as.matrix(test.transform)
+  #y_test  <- test$Scan_type
 
 
+  lda <- lda(y_train~X_train)
+  lda$prior
+  lda$counts
+  predictions <- predict(lda,data.frame(X_train))
+
+  attributes(predictions)
+  print(paste0("Accuracy on train set for ",title, " fillets: ",
+               round(mean(predictions$class==y_train),3)))
+
+  lda1 <- data.frame(predictions$x[,1])
+  lda2 <- data.frame(predictions$x[,2])
+
+  ldahist(data = lda1, g = train$Scan_type,col="blue",type="both"); title(paste0("Group Distributions of LDA1-",title))
+
+  ldahist(data = lda2, g = train$Scan_type, col="orange",type="both");title(paste0("Group Distributions of LDA2-",title))
 
 
+  ll <- data.frame(lda1,lda2)
+  plot(ll[,1],ll[,2],col=train$Scan_type,pch=19,cex=0.6, main=paste0("Linear Discriminant Analysis of ",title," Fillets"),
+       xlab="LDA1",ylab="LDA2")
+  legend(x="topleft", legend=c("OM", "TB","TP"),
+         col=unique(train$Scan_type), lty=1, cex=0.9)
+}
+
+linear.da(df,"all")
+linear.da(fresh,"Fresh")
+linear.da(thawed,"Thawed")
 
 
 
