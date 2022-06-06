@@ -1,6 +1,9 @@
 library(pacman)
-pacman::p_load(ggplot2, Hmisc, dplyr, squash, pavo,plyr)
+pacman::p_load(ggplot2, MASS, Hmisc, dplyr, squash, pavo,plyr)
+set.seed(123)
 
+################################################
+# Load data
 df <- data.frame(read.csv('./Chicken Fillet NIR data.csv',
                           strip.white = TRUE,
                           sep=';', dec=".",
@@ -8,8 +11,8 @@ df <- data.frame(read.csv('./Chicken Fillet NIR data.csv',
 
 # Remove row 455 as it is most likely a measurement error
 df <- df[-455,]
-fresh <- df[df$Freshness == "FR",][,5:length(df)]
-thawed <- df[df$Freshness == "TH",][,5:length(df)]
+fresh <- df[df$Freshness == "FR",]
+thawed <- df[df$Freshness == "TH",]
 
 # Create list of wavelengths from column names
 wavelengths <- substring(colnames(df[5:length(df)]),2,8)
@@ -97,6 +100,21 @@ plot.spectra(om.f.smooth,tb.f.smooth,tp.f.smooth,title="Smoothed NIR data of fre
              colors=c("blue","red","green"))
 plot.spectra(om.t.smooth,tb.t.smooth,tp.t.smooth,title="Smoothed NIR data of thawed chicken fillets",
                 colors=c("cyan","black","magenta"))
+
+###############################################
+# Linear Discriminant Analysis
+
+y <- fresh$Scan_type
+X <- as.matrix(fresh[,5:length(fresh)])
+typeof(X)
+lda <- lda(y~X)
+attributes(lda)
+
+
+
+
+
+
 
 
 
