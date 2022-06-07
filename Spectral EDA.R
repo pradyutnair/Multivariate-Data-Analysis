@@ -1,6 +1,6 @@
 library(pacman)
 pacman::p_load(ggplot2, MASS, Hmisc, dplyr, squash, pavo,plyr,
-               caTools,caret,klaR, factoextra)
+               caTools,caret, klaR, factoextra,FactoMineR)
 set.seed(123)
 
 ################################################
@@ -150,19 +150,34 @@ linear.da(df,"All")
 
 ###############################################
 # PCA of entire df
-df.pca <- prcomp(df[,5:length(df)],center=TRUE, scale = TRUE)
+df.pca <- prcomp(df[,5:length(df)], center=TRUE, scale = TRUE)
 summary(df.pca)
 fviz_eig(df.pca, addlabels = TRUE, ylim = c(0, 80))
-ind <- get_pca_ind(fresh.pca)
+ind <- get_pca_ind(df.pca)
 
 groups <- as.factor(df$Scan_type)
 
-fviz_pca_ind(df.pca,
-             col.ind = groups, # color by groups
-             palette = c("#0000ff", '#7f0000',"#00ff00"),
-             addEllipses = TRUE, # Concentration ellipses
-             ellipse.type = "confidence",
-             legend.title = "Groups",
-             repel = TRUE,
-             max.overlaps=2200)
+# Plot individual variables in the principal component axes
+ind.p <- fviz_pca_ind(df.pca, geom = "point", col.ind = df$Scan_type)
+ggpubr::ggpar(ind.p,
+              title = "PCA-Individuals",
+              subtitle = "Chicken NIR",
+              xlab = "PC1", ylab = "PC2",
+              legend.title = "Scan_Type", legend.position = "top",
+              ggtheme = theme_minimal(), palette="npg"
+)
+
+# Plot the cos2 of each PCA variable (wavelengths)
+fviz_pca_var(df.pca, col.var = "cos2",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE # Avoid text overlapping
+)
+
+# Contributions of wavelengths to PC1
+fviz_contrib(df.pca, choice = "var", axes = 1, top = 50,fill="blue",col="black")
+# Contributions of wavelengths to PC2
+fviz_contrib(df.pca, choice = "var", axes = 2, top = 50,fill="orange",col="black")
+
+
+
 
