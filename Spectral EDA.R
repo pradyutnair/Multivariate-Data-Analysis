@@ -1,5 +1,6 @@
 library(pacman)
-pacman::p_load(ggplot2, MASS, Hmisc, dplyr, squash, pavo,plyr, caTools,caret,klaR)
+pacman::p_load(ggplot2, MASS, Hmisc, dplyr, squash, pavo,plyr,
+               caTools,caret,klaR, factoextra)
 set.seed(123)
 
 ################################################
@@ -123,11 +124,8 @@ linear.da <- function(df,title){
 
 
   lda <- lda(y_train~X_train)
-  lda$prior
-  lda$counts
   predictions <- predict(lda,data.frame(X_train))
 
-  attributes(predictions)
   print(paste0("Accuracy on train set for ",title, " fillets: ",
                round(mean(predictions$class==y_train),3)))
 
@@ -146,14 +144,25 @@ linear.da <- function(df,title){
          col=unique(train$Scan_type), lty=1, cex=0.9)
 }
 
-linear.da(df,"all")
-linear.da(fresh,"Fresh")
-linear.da(thawed,"Thawed")
+linear.da(df,"All")
+#linear.da(fresh,"Fresh")
+#linear.da(thawed,"Thawed")
 
+###############################################
+# PCA of entire df
+df.pca <- prcomp(df[,5:length(df)],center=TRUE, scale = TRUE)
+summary(df.pca)
+fviz_eig(df.pca, addlabels = TRUE, ylim = c(0, 80))
+ind <- get_pca_ind(fresh.pca)
 
+groups <- as.factor(df$Scan_type)
 
-
-
-
-
+fviz_pca_ind(df.pca,
+             col.ind = groups, # color by groups
+             palette = c("#0000ff", '#7f0000',"#00ff00"),
+             addEllipses = TRUE, # Concentration ellipses
+             ellipse.type = "confidence",
+             legend.title = "Groups",
+             repel = TRUE,
+             max.overlaps=2200)
 
