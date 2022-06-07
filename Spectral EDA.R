@@ -1,6 +1,6 @@
 library(pacman)
 pacman::p_load(ggplot2, MASS, Hmisc, dplyr, squash, pavo,plyr,
-               caTools,caret, klaR, factoextra,FactoMineR)
+               caTools,caret, klaR, factoextra,FactoMineR, randomForest)
 set.seed(123)
 
 ################################################
@@ -105,11 +105,14 @@ plot.spectra(om.t.smooth,tb.t.smooth,tp.t.smooth,title="Smoothed NIR data of tha
 
 ###############################################
 # Linear Discriminant Analysis
-# use 70% of dataset as training set and 30% as test set
+
+# Function that creates train and test sets, conducts lda, returns train and test accuracies
+# and lda plots
 linear.da <- function(df,title){
+  # use 70% of dataset as training set and 30% as test set
   sample <- sample.split(df$Scan_type, SplitRatio = 0.7)
   train  <- subset(df, sample == TRUE)
-  #test   <- subset(df, sample == FALSE)
+  test   <- subset(df, sample == FALSE)
 
   preproc.parameter <- train[,5:length(df)] %>%
     preProcess(method = c("center", "scale"))
@@ -118,16 +121,19 @@ linear.da <- function(df,title){
   X_train <- as.matrix(train.transform)
   y_train <- train$Scan_type
 
-  #test.transform <- preproc.parameter %>% predict(test[,5:length(test)])
-  #X_test  <- as.matrix(test.transform)
-  #y_test  <- test$Scan_type
+  test.transform <- preproc.parameter %>% predict(test[,5:length(test)])
+  X_test  <- as.matrix(test.transform)
+  y_test  <- test$Scan_type
 
 
   lda <- lda(y_train~X_train)
   predictions <- predict(lda,data.frame(X_train))
+  pred_test <- predict(lda,newdata=data.frame(X_test))
 
   print(paste0("Accuracy on train set for ",title, " fillets: ",
                round(mean(predictions$class==y_train),3)))
+  print(paste0("Accuracy on test set for ",title, " fillets: ",
+               round(mean(pred_test$class==y_test),3)))
 
   lda1 <- data.frame(predictions$x[,1])
   lda2 <- data.frame(predictions$x[,2])
@@ -177,6 +183,40 @@ fviz_pca_var(df.pca, col.var = "cos2",
 fviz_contrib(df.pca, choice = "var", axes = 1, top = 50,fill="blue",col="black")
 # Contributions of wavelengths to PC2
 fviz_contrib(df.pca, choice = "var", axes = 2, top = 50,fill="orange",col="black")
+
+# Use PCA transformed data on a Random Forest Classifier
+
+# Use a 70-30 split and create train and test sets. Set  target vars as factors
+sample <- sample.split(df$Scan_type, SplitRatio = 0.7)
+train  <- subset(df, sample == TRUE)
+test   <- subset(df, sample == FALSE)
+y_train <- as.factor(train$Scan_type)
+y_test <- as.factor(test$Scan_type)
+
+# Remove first 4 columns from train and test sets
+train <- train[,5:length(train)]
+test <- test[,5:length(test)]
+
+
+# Convert to pca data
+train.pca <- prcomp(train, center = TRUE, scale. = TRUE)
+test.pca <- prcomp(test, center = TRUE, scale. = TRUE)
+#test.pca <- as.matrix(test) %*% train.pca$rotation
+
+# Instatiate the model on pca transformed data. Set number of trees = 2
+rf <- randomForest(y_train~., data=train.pca$x, nTree=2,importance = TRUE)
+# Plot feature importances
+varImpPlot(rf,main="Feature Importances of RF Classifier on PCA transformed data")
+
+# Create prediction variables for train and test data
+rf_pred_train <- predict(rf,type='class')
+rf_pred_test <- predict(rf,newdata=test.pca$x,type='class')
+
+# Return predictions
+print(paste0("RF accuracy on PCA train set: ",
+             round(mean(rf_pred_train==y_train),3)))
+print(paste0("RF Accuracy on PCA test set: ",
+             round(mean(rf_pred_test==y_test),3)))
 
 
 
