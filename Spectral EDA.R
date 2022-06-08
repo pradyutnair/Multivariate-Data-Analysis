@@ -201,16 +201,23 @@ test <- test[,5:length(test)]
 # Convert to pca data
 train.pca <- prcomp(train, center = TRUE, scale. = TRUE)
 test.pca <- prcomp(test, center = TRUE, scale. = TRUE)
-#test.pca <- as.matrix(test) %*% train.pca$rotation
+#test.pca <- train.pca$rotation %*% t(test)
+#test.pca <- t(test.pca)[,1:2]
+#colnames(test.pca) <- c("PC1","PC2")
+
+# Use the first two components as training data
+train.pca <- train.pca$x[,1:2]
+test.pca <- test.pca$x[,1:2]
+
 
 # Instatiate the model on pca transformed data. Set number of trees = 2
-rf <- randomForest(y_train~., data=train.pca$x, nTree=2,importance = TRUE)
+rf <- randomForest(y_train~., data=train.pca, nTree=2,importance = TRUE)
 # Plot feature importances
 varImpPlot(rf,main="Feature Importances of RF Classifier on PCA transformed data")
 
 # Create prediction variables for train and test data
 rf_pred_train <- predict(rf,type='class')
-rf_pred_test <- predict(rf,newdata=test.pca$x,type='class')
+rf_pred_test <- predict(rf,newdata=test.pca,type='class')
 
 # Return predictions
 print(paste0("RF accuracy on PCA train set: ",
