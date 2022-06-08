@@ -33,4 +33,5 @@ Once PCA was conducted and analysed, train and test sets were once again created
 * prcomp was used to fit a PCA model onto the train set, with scaling and centering.
 * `train.pca$x`(Scores) describes the transformed coordinates of the data with respect to the PCs. We used the first two columns of this transformed data as it corresponds to PC1 and PC2. This is the new train set.
 * The train set is a result of the matrix multiplication between`train.pca$rotation` (Loadings) and the test dataset. Loadings x Data = Scores. 
-Using PCA transformed data, the results look promising with a train accuracy of 84% and test accuracy of 86%.
+
+Using PCA transformed data, the results look promising with a train accuracy of 84% and test accuracy of 86%. However, the above formula was not used for creating the test set. PCA was refit on the test data.

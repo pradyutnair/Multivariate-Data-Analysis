@@ -201,6 +201,7 @@ test <- test[,5:length(test)]
 # Convert to pca data
 train.pca <- prcomp(train, center = TRUE, scale. = TRUE)
 test.pca <- prcomp(test, center = TRUE, scale. = TRUE)
+
 #test.pca <- train.pca$rotation %*% t(test)
 #test.pca <- t(test.pca)[,1:2]
 #colnames(test.pca) <- c("PC1","PC2")
