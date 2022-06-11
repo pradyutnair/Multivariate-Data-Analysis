@@ -104,8 +104,42 @@ plot.spectra(om.t.smooth,tb.t.smooth,tp.t.smooth,title="Smoothed NIR data of tha
 
 
 ###############################################
+myBasicPlot<-function(mydata, wavelengths, xlim, ylim){
 
+  #Create color map:
+  par(font=2,las=1,mar = c(5,4,4,10) + 0.1)
 
+  #Plot spectra:
+  matplot(wavelengths,t(mydata$NIR),font.axis=2,main="Baseline",
+          col=mydata$Scan_type,lty=1, xlab="Wavelength (nm)",ylab="Absorbance (log[1/R])",type="l",lwd=3, xlim=xlim, ylim=ylim);
+  minor.tick(nx=2, ny=2,tick.ratio=0.75);
+  par(mar = c(5,4,4,6) + 0.1)
+  legend(x="topleft", legend=c("OM", "TB","TP"),
+         col=mydata$Scan_type, lty=1, cex=0.8)
+}
 
+#Define plot limits:
+xlim<-c(900,1686)
+ylim<-c(0.5,3.5)
+# Plot baseline
+library(hyperSpec)
+NIR <- df[,5:length(df)]
+#Convert mydata to an hyperSpec S4 object:
+mydataHS<-new("hyperSpec", spc = as.matrix(NIR), wavelength = wavelengths)
 
+#Compute baselines using order 2 polynomials:
+baseline<-spc.fit.poly.below(fit.to = mydataHS, poly.order = 2)
 
+mybaseline<-data.frame(df[,1:4], NIR = I(baseline@data$spc))
+
+dim(mybaseline)
+typeof(mybaseline[5])
+#Plot baseline:
+myBasicPlot(mybaseline, wavelengths, xlim, ylim)
+
+#Baseline removal:
+newspectra<-mydataHS@data$spc-baseline@data$spc
+mydataBSL<-data.frame(df[,1:4], NIR = I(newspectra))
+
+#Plot new spectra:
+myBasicPlot(mydataBSL, wavelengths, xlim, ylim = c(0,0.5))
