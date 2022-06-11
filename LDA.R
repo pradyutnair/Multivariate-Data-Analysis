@@ -104,3 +104,4 @@ linear.da(df,"Raw Data")
 linear.da(sg_df,"Savitsky-Golay Smoothened Data")
 
 ###############################################
+??savitskygolay
