@@ -68,8 +68,8 @@ train.pca <- train.pca$x[,1:2]
 test.pca <- test.pca$x[,1:2]
 
 # Instatiate the model on pca transformed data. Set number of trees = 2
-rf_base <- randomForest(y_train~.,data=X_train_base, ntree = 2)
-rf_pca <- randomForest(y_train~., data=train.pca, nTree=2)
+rf_base <- randomForest(y_train~.,data=X_train_base, ntree = 2,importance = TRUE)
+rf_pca <- randomForest(y_train~., data=train.pca, nTree=2,importance = TRUE)
 
 print(rf_base)
 print(rf_pca)
