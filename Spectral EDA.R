@@ -146,43 +146,4 @@ mydataBSL<-data.frame(df[,1:4], NIR = I(newspectra))
 #Plot new spectra:
 myBasicPlot(mydataBSL, wavelengths, xlim, ylim=c(0,1.5),title = "Baseline removed")
 
-linear.da <- function(df,title){
-  # use 70% of dataset as training set and 30% as test set
-  sample <- sample.split(df$Scan_type, SplitRatio = 0.7)
-  train  <- subset(df, sample == TRUE)
-  test   <- subset(df, sample == FALSE)
-
-
-  X_train <- as.matrix(train[,5:length(train)])
-  y_train <- train$Scan_type
-
-  X_test  <- as.matrix(test[,5:length(test)])
-  y_test  <- test$Scan_type
-
-  lda <- lda(y_train~X_train)
-  predictions <- predict(lda,data.frame(X_train))
-  pred_test <- predict(lda,newdata=data.frame(X_test))
-
-  print(paste0("Accuracy on train set for ",title, " fillets: ",
-               round(mean(predictions$class==y_train),3)))
-  print(paste0("Accuracy on test set for ",title, " fillets: ",
-               round(mean(pred_test$class==y_test),3)))
-
-  lda1 <- data.frame(predictions$x[,1])
-  lda2 <- data.frame(predictions$x[,2])
-
-  ldahist(data = lda1, g = train$Scan_type,col="blue",type="both"); title(paste0("Group Distributions of LD1-",title))
-
-  ldahist(data = lda2, g = train$Scan_type, col="orange",type="both");title(paste0("Group Distributions of LD2-",title))
-
-
-  ll <- data.frame(lda1,lda2)
-  plot(ll[,1],ll[,2],col=train$Scan_type,pch=19,cex=0.6, main=paste0("Linear Discriminant Analysis of ",title),
-       xlab="LD1",ylab="LD2")
-  legend(x="topleft", legend=c("OM", "TB","TP"),
-         col=unique(train$Scan_type), lty=1, cex=0.9)
-}
-
-linear.da(df,"Raw NIR data")
-linear.da(mydataBSL,"Baseline-Removed NIR data")
 
