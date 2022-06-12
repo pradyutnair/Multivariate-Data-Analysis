@@ -1,7 +1,7 @@
 library(pacman)
 pacman::p_load(dplyr,MASS,ggplot2,openxlsx, tidyverse, plotly,ggpubr,reshape2,Hmisc,
                cowplot, PerformanceAnalytics,signal)
-
+set.seed(123)
 # Import the data and create dataframe
 setwd('./')
 df <- data.frame(read.csv('../GitHub/Chicken Fillet NIR data.csv',
@@ -25,8 +25,8 @@ sg_df <- cbind(df[,1:4],t(NIR))
 ###############################################
 # Create train and test sets for baseline data and smoothed data
 base_sample <- sample.split(df$Scan_type, SplitRatio = 0.7)
-base_train  <- subset(df, sample == TRUE)
-base_test   <- subset(df, sample == FALSE)
+base_train  <- subset(df, base_sample == TRUE)
+base_test   <- subset(df, base_sample == FALSE)
 
 X_train_base <- as.matrix(base_train[,5:length(base_train)])
 y_train_base <- base_train$Scan_type
@@ -34,8 +34,8 @@ X_test_base  <- as.matrix(base_test[,5:length(base_test)])
 y_test_base  <- base_test$Scan_type
 
 smooth_sample <- sample.split(sg_df$Scan_type, SplitRatio = 0.7)
-smooth_train  <- subset(sg_df, sample == TRUE)
-smooth_test   <- subset(sg_df, sample == FALSE)
+smooth_train  <- subset(sg_df, smooth_sample == TRUE)
+smooth_test   <- subset(sg_df, smooth_sample == FALSE)
 
 X_train_smooth <- as.matrix(smooth_train[,5:length(smooth_train)])
 y_train_smooth <- smooth_train$Scan_type
@@ -47,6 +47,7 @@ lda.smooth <- lda(y_train_smooth~X_train_smooth)
 
 lda.base$prior
 lda.smooth$prior
+attributes(lda.base)
 
 train_preds_base <- predict(lda.base, data.frame(X_train_base))
 test_preds_base  <- predict(lda.base, data.frame(X_test_base))
