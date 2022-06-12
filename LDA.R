@@ -128,4 +128,20 @@ linear.da(df,"Raw Data")
 linear.da(mydataBSL,"SG + Baseline Removed Data")
 
 ###############################################
+print.posteriors <- function(train.set, y.train){
+  posteriors <- train.set$posterior # N x K matrix
+  # MAP classification for sample 1:
+  pred.class <- names(which.max(posteriors[1,])) # <=> lda.prediction.train$class[1]
+  print(paste0("Posterior of predicted class '", pred.class,
+               "' is: ", round(posteriors[1,pred.class], 3)))
+  ## [1] "Posterior of predicted class 'sh' is: 1"
+  # what are the mean posteriors for individual groups?
+  res <- do.call(rbind, (lapply(levels(y.train), function(x) apply(posteriors[y.train == x, ], 2, mean))))
+  rownames(res) <- levels(y.train)
+  print(round(res, 3))
+}
+print.posteriors(train_preds_base, y_train_base)
+print.posteriors(train_preds_smooth, y_train_smooth)
+
+
 
