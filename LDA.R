@@ -20,7 +20,30 @@ wavelengths <- as.numeric(wavelengths)
 ###############################################
 # Apply savitsky-golay smoothing to the data
 NIR<-apply(df[,5:length(df)],1, FUN=sgolayfilt, p = 2, n = 3, m = 0, ts = 1)
-sg_df <- cbind(df[,1:4],t(NIR))
+#sg_df <- cbind(df[,1:4],t(NIR))
+
+###############################################
+# Conduct baseline removal and see if that impacts LDA
+
+# Define nir data
+#NIR <- df[,5:length(df)]
+
+# Convert mydata to an hyperSpec S4 object:
+mydataHS<-new("hyperSpec", spc = as.matrix(t(NIR)), wavelength = wavelengths)
+
+# Compute baselines using order 2 polynomials and append to a dataframe
+baseline<-spc.fit.poly.below(fit.to = mydataHS, poly.order = 2)
+mybaseline<-data.frame(df[,1:4], NIR = I(baseline@data$spc))
+
+# Plot baseline:
+#myBasicPlot(mybaseline, wavelengths, xlim, ylim,title="Baseline")
+
+#Baseline removal:
+newspectra<-mydataHS@data$spc-baseline@data$spc
+mydataBSL<-data.frame(df[,1:4], NIR = I(newspectra))
+
+#Plot new spectra:
+#myBasicPlot(mydataBSL, wavelengths, xlim, ylim=c(0,1.5),title = "Baseline removed")
 
 ###############################################
 # Create train and test sets for baseline data and smoothed data
@@ -102,6 +125,7 @@ linear.da <- function(df,title){
 }
 
 linear.da(df,"Raw Data")
-linear.da(sg_df,"Savitsky-Golay Smoothened Data")
+linear.da(mydataBSL,"SG + Baseline Removed Data")
 
 ###############################################
+
