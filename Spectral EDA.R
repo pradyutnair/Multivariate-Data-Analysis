@@ -1,5 +1,5 @@
 library(pacman)
-pacman::p_load(ggplot2, MASS, Hmisc, dplyr, squash, pavo,plyr,
+pacman::p_load(ggplot2, MASS, Hmisc, dplyr, squash, pavo,plyr,signal,
                caTools,caret, klaR, factoextra,FactoMineR, randomForest,hyperSpec)
 set.seed(123)
 
@@ -124,13 +124,13 @@ xlim<-c(900,1686)
 ylim<-c(0.5,3.5)
 
 ###############################################
-# Conduct baseline removal and see if that impacts LDA
+# Conduct baseline removal
 
-# Define nir data
-NIR <- df[,5:length(df)]
+# Apply savitsky-golay smoothing to the data
+NIR<-apply(df[,5:length(df)],1, FUN=sgolayfilt, p = 2, n = 3, m = 0, ts = 1)
 
 # Convert mydata to an hyperSpec S4 object:
-mydataHS<-new("hyperSpec", spc = as.matrix(NIR), wavelength = wavelengths)
+mydataHS<-new("hyperSpec", spc = as.matrix(t(NIR)), wavelength = wavelengths)
 
 # Compute baselines using order 2 polynomials and append to a dataframe
 baseline<-spc.fit.poly.below(fit.to = mydataHS, poly.order = 2)
@@ -143,7 +143,19 @@ myBasicPlot(mybaseline, wavelengths, xlim, ylim,title="Baseline")
 newspectra<-mydataHS@data$spc-baseline@data$spc
 mydataBSL<-data.frame(df[,1:4], NIR = I(newspectra))
 
+# Plot baseline:
+myBasicPlot(mybaseline, wavelengths, xlim, ylim,title="Baseline of Chicken Fillets NIR")
+
+###############################################
+#Baseline removal:
+newspectra<-mydataHS@data$spc-baseline@data$spc
+mydataBSL<-data.frame(df[,1:4], NIR = I(newspectra))
+
 #Plot new spectra:
 myBasicPlot(mydataBSL, wavelengths, xlim, ylim=c(0,1.5),title = "Baseline removed")
+
+###############################################
+# Save as csv
+write.csv(mydataBSL, file = "NIR_Preprocessed.csv")
 
 
