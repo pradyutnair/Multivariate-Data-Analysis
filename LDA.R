@@ -18,32 +18,10 @@ wavelengths <- substring(colnames(df[5:length(df)]),2,8)
 wavelengths <- as.numeric(wavelengths)
 
 ###############################################
-# Apply savitsky-golay smoothing to the data
-NIR<-apply(df[,5:length(df)],1, FUN=sgolayfilt, p = 2, n = 3, m = 0, ts = 1)
-#sg_df <- cbind(df[,1:4],t(NIR))
-
-###############################################
-# Conduct baseline removal and see if that impacts LDA
-
-# Define nir data
-#NIR <- df[,5:length(df)]
-
-# Convert mydata to an hyperSpec S4 object:
-mydataHS<-new("hyperSpec", spc = as.matrix(t(NIR)), wavelength = wavelengths)
-
-# Compute baselines using order 2 polynomials and append to a dataframe
-baseline<-spc.fit.poly.below(fit.to = mydataHS, poly.order = 2)
-mybaseline<-data.frame(df[,1:4], NIR = I(baseline@data$spc))
-
-# Plot baseline:
-#myBasicPlot(mybaseline, wavelengths, xlim, ylim,title="Baseline")
-
-#Baseline removal:
-newspectra<-mydataHS@data$spc-baseline@data$spc
-mydataBSL<-data.frame(df[,1:4], NIR = I(newspectra))
-
-#Plot new spectra:
-#myBasicPlot(mydataBSL, wavelengths, xlim, ylim=c(0,1.5),title = "Baseline removed")
+# Load preprocessed data
+# This dataset contains NIR that has baseline removed and Savitsky-Golay applied
+preprocessed.df <- read.csv('./NIR_Preprocessed.csv',sep=',',stringsAsFactors=TRUE,strip.white = TRUE)
+preprocessed.df <- preprocessed.df[,-1]
 
 ###############################################
 # Create train and test sets for baseline data and smoothed data
@@ -56,9 +34,9 @@ y_train_base <- base_train$Scan_type
 X_test_base  <- as.matrix(base_test[,5:length(base_test)])
 y_test_base  <- base_test$Scan_type
 
-smooth_sample <- sample.split(sg_df$Scan_type, SplitRatio = 0.7)
-smooth_train  <- subset(sg_df, smooth_sample == TRUE)
-smooth_test   <- subset(sg_df, smooth_sample == FALSE)
+smooth_sample <- sample.split(mydataBSL$Scan_type, SplitRatio = 0.7)
+smooth_train  <- subset(mydataBSL, smooth_sample == TRUE)
+smooth_test   <- subset(mydataBSL, smooth_sample == FALSE)
 
 X_train_smooth <- as.matrix(smooth_train[,5:length(smooth_train)])
 y_train_smooth <- smooth_train$Scan_type
@@ -125,7 +103,7 @@ linear.da <- function(df,title){
 }
 
 linear.da(df,"Raw Data")
-linear.da(mydataBSL,"SG + Baseline Removed Data")
+linear.da(preprocessed.df,"Preprocessed Data")
 
 ###############################################
 print.posteriors <- function(train.set, y.train){
