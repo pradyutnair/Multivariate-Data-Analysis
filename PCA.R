@@ -1,6 +1,6 @@
 library(pacman)
-pacman::p_load(dplyr,MASS,ggplot2,openxlsx, tidyverse, plotly,ggpubr,reshape2,Hmisc,
-               cowplot, PerformanceAnalytics,signal)
+pacman::p_load(dplyr,MASS,ggplot2,openxlsx, factoextra, tidyverse, plotly,ggpubr,reshape2,Hmisc,
+               cowplot, PerformanceAnalytics,signal, caTools, randomForest)
 
 # Import the data and create dataframe
 setwd('./')
@@ -42,9 +42,41 @@ fviz_contrib(df.pca, choice = "var", axes = 1, top = 50,fill="blue",col="black")
 # Contributions of wavelengths to PC2
 fviz_contrib(df.pca, choice = "var", axes = 2, top = 50,fill="orange",col="black")
 
-# Use PCA transformed data on a Random Forest Classifier
+########################################################################
+# First test SVM with baseline and PCA data
+svm.base <- svm(formula = y_train ~ .,
+                data = data.frame(X_train_base),
+                type = 'C-classification',
+                kernel = 'linear')
+svm.pca <- svm(formula = y_train ~ .,
+               data = data.frame(train.pca),
+               type = 'C-classification',
+               kernel = 'linear')
 
+# Create prediction variables for train and test data
+pred_base_train <- predict(svm.base,newdata=data.frame(X_train_base))
+pred_base_test <- predict(svm.base,newdata=data.frame(X_test_base))
+
+
+pred_pca_train <- predict(svm.pca)
+pred_pca_test <- predict(svm.pca,newdata=data.frame(test.pca))
+
+
+# Return predictions
+print(paste0("SVM accuracy on base train set: ",
+             round(mean(pred_base_train==y_train),3)))
+print(paste0("SVM Accuracy on base test set: ",
+             round(mean(pred_base_test==y_test),3)))
+
+print(paste0("SVM accuracy on PCA train set: ",
+             round(mean(pred_pca_train==y_train),3)))
+print(paste0("SVM Accuracy on PCA test set: ",
+             round(mean(pred_pca_test==y_test),3)))
+
+########################################################################
+# Use PCA transformed data on a Random Forest Classifier
 # Use a 70-30 split and create train and test sets. Set  target vars as factors
+
 sample <- sample.split(df$Scan_type, SplitRatio = 0.7)
 train  <- subset(df, sample == TRUE)
 test   <- subset(df, sample == FALSE)
@@ -96,3 +128,4 @@ print(paste0("RF accuracy on PCA train set: ",
 print(paste0("RF Accuracy on PCA test set: ",
              round(mean(pred_pca_test==y_test),3)))
 
+########################################################################
