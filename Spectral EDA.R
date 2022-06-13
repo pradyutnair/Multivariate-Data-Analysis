@@ -187,7 +187,7 @@ matplot(wavelengths,t(msc.spectra[,5:length(msc.spectra)]),font.axis=2,main='MSC
 
 ###############################################
 # Save as csv
-ospectra <- df[,5:length(df)] # original spectra
+ospectra <- mydataBSL[,5:length(mydataBSL)] # original spectra
 snv <- prep.snv(ospectra)
 msc <- prep.msc(as.matrix(snv))
 msc <- cbind(df[,1:4], msc)
