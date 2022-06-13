@@ -20,7 +20,7 @@ wavelengths <- as.numeric(wavelengths)
 ###############################################
 # Load preprocessed data
 # This dataset contains NIR that has baseline removed and Savitsky-Golay applied
-preprocessed.df <- read.csv('./NIR_Preprocessed.csv',sep=',',stringsAsFactors=TRUE,strip.white = TRUE)
+preprocessed.df <- read.csv('./NIR_SNV_MSC.csv',sep=',',stringsAsFactors=TRUE,strip.white = TRUE)
 preprocessed.df <- preprocessed.df[,-1]
 
 ###############################################
