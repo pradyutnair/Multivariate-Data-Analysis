@@ -44,7 +44,8 @@ Highlight risks so your reviewers can direct their attention here.
 
 Break down the solution into key tasks and their estimated deadlines. 
 
-- 
+- Get the models for Distribution of production systems until 13/06 - Felipe
+- Do outlier detection and further data cleaning - Felipe
 
 ### Open Questions
 
