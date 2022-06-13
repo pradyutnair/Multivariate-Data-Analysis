@@ -149,7 +149,7 @@ myBasicPlot(mydataBSL, wavelengths, xlim, ylim=c(0,1.5),title = "Baseline remove
 
 ###############################################
 # Save as csv
-write.csv(mydataBSL, file = "NIR_Preprocessed.csv")
+write.csv(mydataBSL, file = "NIR_Baseline_Removed.csv")
 
 ###############################################
 library(mdatools)
@@ -184,3 +184,11 @@ plot.spectra(om.f,tb.f,tp.f,title="Raw NIR data of fresh chicken fillets",
              colors=c("blue","red","green"))
 matplot(wavelengths,t(msc.spectra[,5:length(msc.spectra)]),font.axis=2,main='MSC NIR',
         col=msc.spectra$Scan_type,lty=1, xlab="Wavelength (nm)",ylab="Absorbance (log[1/R])",type="l",lwd=3);
+
+###############################################
+# Save as csv
+ospectra <- df[,5:length(df)] # original spectra
+snv <- prep.snv(ospectra)
+msc <- prep.msc(as.matrix(snv))
+msc <- cbind(df[,1:4], msc)
+write.csv(msc, file = "NIR_SNV_MSC.csv")
