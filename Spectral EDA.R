@@ -159,3 +159,5 @@ myBasicPlot(mydataBSL, wavelengths, xlim, ylim=c(0,1.5),title = "Baseline remove
 write.csv(mydataBSL, file = "NIR_Preprocessed.csv")
 
 
+
+
