@@ -137,13 +137,6 @@ baseline<-spc.fit.poly.below(fit.to = mydataHS, poly.order = 2)
 mybaseline<-data.frame(df[,1:4], NIR = I(baseline@data$spc))
 
 # Plot baseline:
-myBasicPlot(mybaseline, wavelengths, xlim, ylim,title="Baseline")
-
-#Baseline removal:
-newspectra<-mydataHS@data$spc-baseline@data$spc
-mydataBSL<-data.frame(df[,1:4], NIR = I(newspectra))
-
-# Plot baseline:
 myBasicPlot(mybaseline, wavelengths, xlim, ylim,title="Baseline of Chicken Fillets NIR")
 
 ###############################################
@@ -158,6 +151,36 @@ myBasicPlot(mydataBSL, wavelengths, xlim, ylim=c(0,1.5),title = "Baseline remove
 # Save as csv
 write.csv(mydataBSL, file = "NIR_Preprocessed.csv")
 
+###############################################
+library(mdatools)
+
+ospectra <- df[,5:length(df)] # original spectra
+
+# conduct snv
+pspectra <- prep.snv(ospectra)
+pspectra <- cbind(df[,1:4], pspectra)
+# plot snv correction
+matplot(wavelengths,t(pspectra[,5:length(pspectra)]),font.axis=2,main='SNV NIR',
+        col=pspectra$Scan_type,lty=1, xlab="Wavelength (nm)",ylab="Absorbance (log[1/R])",type="l",lwd=3);
+minor.tick(nx=2, ny=2,tick.ratio=0.75);
+
+# conduct msc
+msc.spectra <- prep.msc(as.matrix(ospectra))
+msc.spectra <- cbind(df[,1:4], msc.spectra)
+# plot msc
+matplot(wavelengths,t(msc.spectra[,5:length(msc.spectra)]),font.axis=2,main='MSC NIR',
+        col=msc.spectra$Scan_type,lty=1, xlab="Wavelength (nm)",ylab="Absorbance (log[1/R])",type="l",lwd=3);
+
+# Plot both preprocessing methods compared to original data
+par(mfrow = c(2, 1))
+plot.spectra(om.f,tb.f,tp.f,title="Raw NIR data of fresh chicken fillets",
+             colors=c("blue","red","green"))
+matplot(wavelengths,t(pspectra[,5:length(pspectra)]),font.axis=2,main='SNV NIR',
+        col=pspectra$Scan_type,lty=1, xlab="Wavelength (nm)",ylab="Absorbance (log[1/R])",type="l",lwd=3);
 
 
-
+par(mfrow = c(2, 1))
+plot.spectra(om.f,tb.f,tp.f,title="Raw NIR data of fresh chicken fillets",
+             colors=c("blue","red","green"))
+matplot(wavelengths,t(msc.spectra[,5:length(msc.spectra)]),font.axis=2,main='MSC NIR',
+        col=msc.spectra$Scan_type,lty=1, xlab="Wavelength (nm)",ylab="Absorbance (log[1/R])",type="l",lwd=3);

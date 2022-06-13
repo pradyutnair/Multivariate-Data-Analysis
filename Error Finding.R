@@ -10,6 +10,7 @@ df <- data.frame(read.csv('./Chicken Fillet NIR data.csv',
                           stringsAsFactors = TRUE))
 ################################################
 # Error finding
+par(mfrow=c(1,1))
 df.rspec <- as.rspec(df[,5:length(df)])
 # Plot row 455
 plot(t(df.rspec[455,])[-1,], xlab="Wavelength (nm)",ylab="Absorbance (log[1/R])",
