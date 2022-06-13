@@ -31,7 +31,7 @@ model <- selectCompNum(plsda.model, 9)
 summary(model)                    # Model summary
 getConfusionMatrix(model$calres)  # Confusion matrix
 summary(model$calres)             # Summary of per class performance
- plotPredictions(model)           # Plot of predictions
+plotPredictions(model)            # Plot of predictions
 
 ## 2. Show performance plots for a model
 par(mfrow = c(2, 2))
@@ -55,3 +55,31 @@ plotXYScores(model)
 plotYVariance(model)
 plotXResiduals(model)
 plotRegcoeffs(model, ny = 2)
+
+#################################################################
+library(sgPLS)
+library(mixOmics)
+
+MyResult.splsda <- splsda(x.cal, y.cal, keepX = c(50,50)) # 1 Run the method
+plotIndiv(MyResult.splsda)
+plotVar(MyResult.splsda)
+background <- background.predict(MyResult.splsda, comp.predicted=2,
+                                 dist = "max.dist")
+#plotIndiv(MyResult.splsda, comp = 1:2, group = df$Scan_type,
+          #ind.names = FALSE, title = "Maximum distance",
+          #legend = TRUE,  background = background)
+
+auc.plsda <- auroc(MyResult.splsda)
+MyResult.splsda2 <- splsda(x.cal,y.cal, ncomp=9, keepX=c(15,10,5))
+selectVar(MyResult.splsda2, comp=9)$value
+
+MyResult.plsda2 <- splsda(x.cal,y.cal, ncomp=10)
+set.seed(30) # for reproducbility in this vignette, otherwise increase nrepeat
+MyPerf.plsda <- perf(MyResult.plsda2, validation = "Mfold", folds = 3,
+                     progressBar = TRUE, nrepeat = 1) # we suggest nrepeat = 50
+
+plot(MyPerf.plsda, col = color.mixo(5:7), sd = TRUE, legend.position = "horizontal")
+??selectCompNum
+
+
+#################################################################
