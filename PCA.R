@@ -1,6 +1,6 @@
 library(pacman)
 pacman::p_load(dplyr,MASS,ggplot2,openxlsx, factoextra, tidyverse, plotly,ggpubr,reshape2,Hmisc,
-               cowplot, PerformanceAnalytics,signal, caTools, randomForest)
+               cowplot, PerformanceAnalytics,signal, caTools, randomForest,e1071)
 
 # Import the data and create dataframe
 setwd('./')
@@ -8,6 +8,7 @@ df <- data.frame(read.csv('../GitHub/Chicken Fillet NIR data.csv',
                           strip.white = TRUE,
                           sep=';',
                           stringsAsFactors = TRUE))
+
 # Remove row 455 as it is most likely a measurement error
 df <- df[-455,]
 fresh <- df[df$Freshness == "FR",]
@@ -42,12 +43,38 @@ fviz_contrib(df.pca, choice = "var", axes = 1, top = 50,fill="blue",col="black")
 # Contributions of wavelengths to PC2
 fviz_contrib(df.pca, choice = "var", axes = 2, top = 50,fill="orange",col="black")
 
+
+
+########################################################################
+# Create train and test sets
+sample <- sample.split(df$Scan_type, SplitRatio = 0.7)
+train  <- subset(df, sample == TRUE)
+test   <- subset(df, sample == FALSE)
+
+X_train_base <- as.matrix(train[,5:length(train)])
+X_test_base <- as.matrix(test[,5:length(test)])
+y_train <- as.factor(train$Scan_type)
+y_test <- as.factor(test$Scan_type)
+
+# Remove first 4 columns from train and test sets
+train <- train[,5:length(train)]
+test <- test[,5:length(test)]
+
+# Convert to pca data
+train.pca <- prcomp(train, center = TRUE, scale. = TRUE)
+test.pca <- prcomp(test, center = TRUE, scale. = TRUE)
+
+# Use the first two components as training data
+train.pca <- train.pca$x[,1:2]
+test.pca <- test.pca$x[,1:2]
+
 ########################################################################
 # First test SVM with baseline and PCA data
 svm.base <- svm(formula = y_train ~ .,
                 data = data.frame(X_train_base),
                 type = 'C-classification',
                 kernel = 'linear')
+
 svm.pca <- svm(formula = y_train ~ .,
                data = data.frame(train.pca),
                type = 'C-classification',
@@ -74,32 +101,7 @@ print(paste0("SVM Accuracy on PCA test set: ",
              round(mean(pred_pca_test==y_test),3)))
 
 ########################################################################
-# Use PCA transformed data on a Random Forest Classifier
-# Use a 70-30 split and create train and test sets. Set  target vars as factors
-
-sample <- sample.split(df$Scan_type, SplitRatio = 0.7)
-train  <- subset(df, sample == TRUE)
-test   <- subset(df, sample == FALSE)
-
-
-X_train_base <- as.matrix(train[,5:length(train)])
-X_test_base <- as.matrix(test[,5:length(test)])
-y_train <- as.factor(train$Scan_type)
-y_test <- as.factor(test$Scan_type)
-
-# Remove first 4 columns from train and test sets
-train <- train[,5:length(train)]
-test <- test[,5:length(test)]
-
-# Convert to pca data
-train.pca <- prcomp(train, center = TRUE, scale. = TRUE)
-test.pca <- prcomp(test, center = TRUE, scale. = TRUE)
-
-# Use the first two components as training data
-train.pca <- train.pca$x[,1:2]
-test.pca <- test.pca$x[,1:2]
-
-# Instatiate the model on pca transformed data. Set number of trees = 2
+# Instatiate the RF model on pca transformed data. Set number of trees = 2
 rf_base <- randomForest(y_train~.,data=X_train_base, ntree = 2,importance = TRUE)
 rf_pca <- randomForest(y_train~., data=train.pca, nTree=2,importance = TRUE)
 
