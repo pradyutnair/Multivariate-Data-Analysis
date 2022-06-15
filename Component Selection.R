@@ -49,5 +49,4 @@ plot(MyPerf.plsda, col = color.mixo(5:7), sd = TRUE, legend.position = "horizont
 
 
 #################################################################
-library(caret)
-classifier <- train(form = Scan_type ~ ., data = df, method = 'svmRadial')
+

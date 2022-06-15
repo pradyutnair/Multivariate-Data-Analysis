@@ -21,12 +21,12 @@ wavelengths <- as.numeric(wavelengths)
 #################################################################
 # Create x and y calibration variables
 
-x.cal <- df2[,5:length(df2)] # NIR data as the x variables
-y.cal <- df2[,3]             # Scan_type
+x.cal <- df[,5:length(df)] # NIR data as the x variables
+y.cal <- df[,3]             # Scan_type
 
 #################################################################
 # Create a PLS-DA model with 2 components and 5 fold cv
-plsda.model <- plsda(x.cal, y.cal,ncomp=10)
+plsda.model <- plsda(x.cal, y.cal,ncomp=10,cv=5)
 model <- selectCompNum(plsda.model,10)
 
 summary(model)                    # Model summary
@@ -39,16 +39,15 @@ par(mfrow = c(2, 2))
 plotSpecificity(model)
 plotSensitivity(model)
 plotMisclassified(model)
-plotMisclassified(model, nc = 10)
+plotMisclassified(model, nc = 2)
 par(mfrow = c(1, 1))
 
 ## 3. Show both class and y values predictions
 par(mfrow = c(2, 2))
-plotPredictions(model)
-plotPredictions(model, res = "cal", ncomp = 10, nc = 2)
-plotPredictions(structure(model, class = "regmodel"))
+plotPredictions(model);
+plotPredictions(model, res = "cal", ncomp = 10, nc = 2);
+plotPredictions(structure(model, class = "regmodel"));
 plotPredictions(structure(model, class = "regmodel"), ncomp = 10, ny = 2)
-par(mfrow = c(1, 1))
 
 ## 4. All plots from ordinary PLS can be used, e.g.:
 par(mfrow = c(2, 2))
