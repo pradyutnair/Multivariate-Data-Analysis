@@ -9,10 +9,14 @@ df <- data.frame(read.csv('../GitHub/Chicken Fillet NIR data.csv',
                           sep=';',
                           stringsAsFactors = TRUE))
 
+df <- read.csv('./NIR_SNV_MSC.csv',sep=',',stringsAsFactors=TRUE,strip.white = TRUE)
+df <- df[,-1]
+
 # Remove row 455 as it is most likely a measurement error
-df <- df[-455,]
+#df <- df[-455,]
 fresh <- df[df$Freshness == "FR",]
 thawed <- df[df$Freshness == "TH",]
+
 
 # PCA of entire df
 df.pca <- prcomp(df[,5:length(df)], center=TRUE, scale = TRUE)
@@ -20,7 +24,7 @@ summary(df.pca)
 fviz_eig(df.pca, addlabels = TRUE, ylim = c(0, 80))
 ind <- get_pca_ind(df.pca)
 
-groups <- as.factor(df$Scan_type)
+groups <- as.factor(df$Freshness)
 
 # Plot individual variables in the principal component axes
 ind.p <- fviz_pca_ind(df.pca, geom = "point", col.ind = df$Scan_type)
@@ -28,7 +32,7 @@ ggpubr::ggpar(ind.p,
               title = "PCA-Individuals",
               subtitle = "Chicken NIR",
               xlab = "PC1", ylab = "PC2",
-              legend.title = "Scan_Type", legend.position = "top",
+              legend.title = "Scan_type", legend.position = "top",
               ggtheme = theme_minimal(), palette="npg"
 )
 
@@ -53,8 +57,8 @@ test   <- subset(df, sample == FALSE)
 
 X_train_base <- as.matrix(train[,5:length(train)])
 X_test_base <- as.matrix(test[,5:length(test)])
-y_train <- as.factor(train$Scan_type)
-y_test <- as.factor(test$Scan_type)
+y_train <- as.factor(train$Freshness)
+y_test <- as.factor(test$Freshness)
 
 # Remove first 4 columns from train and test sets
 train <- train[,5:length(train)]
@@ -65,8 +69,8 @@ train.pca <- prcomp(train, center = TRUE, scale. = TRUE)
 test.pca <- prcomp(test, center = TRUE, scale. = TRUE)
 
 # Use the first two components as training data
-train.pca <- train.pca$x[,1:2]
-test.pca <- test.pca$x[,1:2]
+train.pca <- train.pca$x[,1:3]
+test.pca <- test.pca$x[,1:3]
 
 ########################################################################
 # First test SVM with baseline and PCA data

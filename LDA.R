@@ -1,6 +1,6 @@
 library(pacman)
 pacman::p_load(dplyr,MASS,ggplot2,openxlsx, tidyverse, plotly,ggpubr,reshape2,Hmisc,
-               cowplot, PerformanceAnalytics,signal)
+               cowplot, PerformanceAnalytics,signal,caTools)
 set.seed(123)
 # Import the data and create dataframe
 setwd('./')
@@ -30,18 +30,18 @@ base_train  <- subset(df, base_sample == TRUE)
 base_test   <- subset(df, base_sample == FALSE)
 
 X_train_base <- as.matrix(base_train[,5:length(base_train)])
-y_train_base <- base_train$Scan_type
+y_train_base <- base_train$Freshness
 X_test_base  <- as.matrix(base_test[,5:length(base_test)])
-y_test_base  <- base_test$Scan_type
+y_test_base  <- base_test$Freshness
 
-smooth_sample <- sample.split(mydataBSL$Scan_type, SplitRatio = 0.7)
-smooth_train  <- subset(mydataBSL, smooth_sample == TRUE)
-smooth_test   <- subset(mydataBSL, smooth_sample == FALSE)
+smooth_sample <- sample.split(preprocessed.df$Scan_type, SplitRatio = 0.7)
+smooth_train  <- subset(preprocessed.df, smooth_sample == TRUE)
+smooth_test   <- subset(preprocessed.df, smooth_sample == FALSE)
 
 X_train_smooth <- as.matrix(smooth_train[,5:length(smooth_train)])
-y_train_smooth <- smooth_train$Scan_type
+y_train_smooth <- smooth_train$Freshness
 X_test_smooth  <- as.matrix(smooth_test[,5:length(smooth_test)])
-y_test_smooth  <- smooth_test$Scan_type
+y_test_smooth  <- smooth_test$Freshness
 
 lda.base <- lda(y_train_base~X_train_base)
 lda.smooth <- lda(y_train_smooth~X_train_smooth)
@@ -59,9 +59,9 @@ print(paste0("Accuracy on train set for raw data: ",
              round(mean(train_preds_base$class==y_train_base),3)))
 print(paste0("Accuracy on test set for raw data: ",
              round(mean(test_preds_base$class==y_test_base),3)))
-print(paste0("Accuracy on train set for Savitsky-Golay data: ",
+print(paste0("Accuracy on train set for preprocessed data: ",
              round(mean(train_preds_smooth$class==y_train_smooth),3)))
-print(paste0("Accuracy on test set for Savitsky-Golay data: ",
+print(paste0("Accuracy on test set for preprocessed data: ",
              round(mean(test_preds_smooth$class==y_test_smooth),3)))
 ###############################################
 # Create baseline model
@@ -98,7 +98,7 @@ linear.da <- function(df,title){
   ll <- data.frame(lda1,lda2)
   plot(ll[,1],ll[,2],col=train$Scan_type,pch=19,cex=0.6, main=paste0("Linear Discriminant Analysis of ",title),
        xlab="LD1",ylab="LD2")
-  legend(x="topleft", legend=c("OM", "TB","TP"),
+  legend(x="topleft", legend=c("OM","TB","TP"),
          col=unique(train$Scan_type), lty=1, cex=0.9)
 }
 
