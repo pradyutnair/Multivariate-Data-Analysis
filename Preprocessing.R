@@ -70,7 +70,9 @@ plot.spectra <- function(om.spec,tb.spec,tp.spec,title,colors){
 ################################################
 # Perform SNV and MSC
 NIR <- df[,5:length(df)]
-snv.spectra <- prep.snv(NIR)
+NIR.svg<-apply(NIR,1, FUN=sgolayfilt, p = 2, n = 3, m = 0, ts = 1)
+sg.df <- cbind(df[,1:4],t(NIR.svg))
+snv.spectra <- prep.snv(t(NIR.svg))
 msc.spectra <- prep.snv(as.matrix(snv.spectra))
 snv.df <- cbind(df[,1:4],snv.spectra)
 msc.df <- cbind(df[,1:4],msc.spectra)
@@ -90,3 +92,5 @@ plot.spectra(om.f.snv,tb.f.snv,tp.f.snv,title="MSC NIR data of fresh chicken fil
 plot.spectra(om.t.snv,tb.t.snv,tp.t.snv,title="MSC NIR data of thawed chicken fillets",
              colors=c("cyan","black","magenta"))
 
+###############################################
+write.csv(msc.df,"NIR_Preprocessed.csv")
