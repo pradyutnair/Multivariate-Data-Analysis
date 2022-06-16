@@ -65,7 +65,7 @@ plot.spectra <- function(om.spec,tb.spec,tp.spec,title,colors){
        ylim=c(0.5,3.5))
   par(new=TRUE)
   plot(tb.spec, xlab="Wavelength (nm)",ylab="Absorbance", col =colors[2],main=title,
-       xlim=c(900,1680),ylim=c(0.5,3.5))
+       xlim=c(900,1680))
   legend(x="topleft", legend=c("OM", "TB","TP"),
          col=c(colors[1],colors[2],colors[3]), lty=1, cex=0.8)
 }
@@ -187,8 +187,23 @@ matplot(wavelengths,t(msc.spectra[,5:length(msc.spectra)]),font.axis=2,main='MSC
 
 ###############################################
 # Save as csv
-ospectra <- mydataBSL[,5:length(mydataBSL)] # original spectra
+ospectra <- df[,5:length(df)] # original spectra
 snv <- prep.snv(ospectra)
 msc <- prep.msc(as.matrix(snv))
 msc <- cbind(df[,1:4], msc)
 write.csv(msc, file = "NIR_SNV_MSC.csv")
+
+# Create spectral data for fresh and thawed data
+om.f <- create.spectra(msc,"FR")$om
+tb.f <- create.spectra(msc,"FR")$tb
+tp.f <- create.spectra(msc,"FR")$tp
+
+om.t <- create.spectra(msc,"TH")$om
+tb.t <- create.spectra(msc,"TH")$tb
+tp.t <- create.spectra(msc,"TH")$tp
+
+# Plot spectral data
+plot.spectra(om.f,tb.f,tp.f,title="Raw NIR data of fresh chicken fillets",
+             colors=c("blue","red","green"))
+plot.spectra(om.t,tb.t,tp.t,title="Raw NIR data of thawed chicken fillets",
+             colors=c("cyan","black","magenta"))
