@@ -1,9 +1,9 @@
 library(pacman)
-pacman::p_load(caTools,tidyverse,caret,e1071,splitTools,ranger)
+pacman::p_load(caTools,tidyverse,caret,e1071,splitTools,ranger,mdatools)
 
 ############################################################
 # Import data
-df <- read.csv('./NIR_SNV_MSC.csv',sep=',',stringsAsFactors=TRUE,strip.white = TRUE)
+df <- read.csv('./NIR_Preprocessed.csv',sep=',',stringsAsFactors=TRUE,strip.white = TRUE)
 df <- df[,-1]
 
 ############################################################
@@ -51,10 +51,23 @@ svm.om<- svm(formula = y_om_train ~ .,
 
 om_train_preds <- predict(svm.om,newdata=data.frame(X_om_train))
 om_test_preds <- predict(svm.om,newdata=data.frame(X_om_test))
+
+# Accuracies
 print(paste0("SVM accuracy on OM train set: ",
              round(mean(om_train_preds==y_om_train),3)))
 print(paste0("SVM accuracy on OM test set: ",
              round(mean(om_test_preds==y_om_test),3)))
+
+# Sensitivity and specificity
+print(paste0("SVM Train OM Sensitivity: ",
+             round(sensitivity(om_train_preds, y_om_train),3)))
+print(paste0("SVM Train OM Specificity: ",
+             round(specificity(om_train_preds, y_om_train),3)))
+
+print(paste0("SVM Test OM Sensitivity: ",
+             round(sensitivity(om_test_preds, y_om_test),3)))
+print(paste0("SVM Test OM Specificity: ",
+             round(specificity(om_test_preds, y_om_test),3)))
 ############################################################
 # SVM on TB
 m <- tune.svm(x = X_tb_train,y=y_tb_train,
@@ -72,10 +85,24 @@ svm.tb <- svm(formula = y_tb_train ~ .,
 
 tb_train_preds <- predict(svm.tb,newdata=data.frame(X_tb_train))
 tb_test_preds <- predict(svm.tb,newdata=data.frame(X_tb_test))
+
+# Accuracies
 print(paste0("SVM accuracy on TB train set: ",
              round(mean(tb_train_preds==y_tb_train),3)))
 print(paste0("SVM accuracy on TB test set: ",
              round(mean(tb_test_preds==y_tb_test),3)))
+
+# Sensitivity and specificity
+print(paste0("SVM Train TB Sensitivity: ",
+             round(sensitivity(tb_train_preds, y_tb_train),3)))
+print(paste0("SVM Train TB Specificity: ",
+             round(specificity(tb_train_preds, y_tb_train),3)))
+
+print(paste0("SVM Test TB Sensitivity: ",
+             round(sensitivity(tb_test_preds, y_tb_test),3)))
+print(paste0("SVM Test TB Specificity: ",
+             round(specificity(tb_test_preds, y_tb_test),3)))
+
 ############################################################
 # SVM on TP
 m <- tune.svm(x = X_tp_train,y=y_tp_train,
@@ -93,8 +120,22 @@ svm.tp <- svm(formula = y_tp_train ~ .,
 
 tp_train_preds <- predict(svm.tp,newdata=data.frame(X_tp_train))
 tp_test_preds <- predict(svm.tp,newdata=data.frame(X_tp_test))
+
+# Accuracies
 print(paste0("SVM accuracy on TP train set: ",
              round(mean(tp_train_preds==y_tp_train),3)))
 print(paste0("SVM accuracy on TP test set: ",
                 round(mean(tp_test_preds==y_tp_test),3)))
+
+# Sensitivity and specificity
+print(paste0("SVM Train TB Sensitivity: ",
+             round(sensitivity(tp_train_preds, y_tp_train),3)))
+print(paste0("SVM Train TB Specificity: ",
+             round(specificity(tp_train_preds, y_tp_train),3)))
+
+print(paste0("SVM Test TB Sensitivity: ",
+             round(sensitivity(tp_test_preds, y_tp_test),3)))
+print(paste0("SVM Test TB Specificity: ",
+             round(specificity(tp_test_preds, y_tp_test),3)))
+
 ############################################################
