@@ -1,7 +1,8 @@
 library(pacman)
 pacman::p_load(tidyverse,mdatools)
 set.seed(123)
-
+dirName = dirname(rstudioapi::getSourceEditorContext()$path)
+setwd(dirName)
 ################################################
 # Load data
 df <- data.frame(read.csv('./Chicken Fillet NIR data.csv',
