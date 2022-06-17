@@ -56,4 +56,3 @@ print(paste0("LDA test accuracy on TB: ",round(lda.tb$accTest,3)))
 print(paste0("LDA test accuracy on TP: ",round(lda.tp$accTest,3)))
 
 #############################################################
-
