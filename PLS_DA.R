@@ -22,7 +22,7 @@ wavelengths <- as.numeric(wavelengths)
 # Create x and y calibration variables
 
 x.cal <- df[,5:length(df)] # NIR data as the x variables
-y.cal <- df[,3]             # Scan_type
+y.cal <- df[,4]             # Scan_type
 
 #################################################################
 # Create a PLS-DA model with 2 components and 5 fold cv
