@@ -45,6 +45,7 @@ y_tb_test <- base_test[base_test$Scan_type == "TB",]$Freshness
 y_tp_test <- base_test[base_test$Scan_type == "TP",]$Freshness
 ############################################################
 # Baseline OM performance
+# Radial kernel gives best performance on train data
 svm.om.base <- svm(X_om_train, y_om_train, type = "C-classification",
                    kernel = "radial")
 
@@ -61,8 +62,6 @@ print(paste0("SVM BASE accuracy on OM test set: ",
 m <- tune.svm(x = X_om_valid,y=y_om_valid,
               tunecontrol=tune.control(cross=10),cost=1:3,gamma=seq(0,1,by=0.1))
 
-attributes(m)
-m$performances
 m$best.model
 m$best.parameters
 

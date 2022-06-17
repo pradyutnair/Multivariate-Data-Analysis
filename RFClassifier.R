@@ -1,5 +1,5 @@
 library(pacman)
-pacman::p_load(randomForest,mlbench,tidyverse,caret,e1071,splitTools,ranger,mdatools,superml)
+pacman::p_load(randomForest,mlbench,tidyverse,caret,splitTools,ranger,mdatools,superml)
 
 ############################################################
 # Import data

@@ -7,7 +7,7 @@ df <- data.frame(read.csv('./Chicken Fillet NIR data.csv',
                           sep=';',
                           stringsAsFactors = TRUE))
 
-df2 <- read.csv('./NIR_SNV_MSC.csv',sep=',',stringsAsFactors=TRUE,strip.white = TRUE)
+df2 <- read.csv('./NIR_Preprocessed.csv',sep=',',stringsAsFactors=TRUE,strip.white = TRUE)
 df2 <- df2[,-1]
 # Remove row 455 as it is most likely a measurement error
 #df <- df[-455,]
@@ -22,7 +22,7 @@ wavelengths <- as.numeric(wavelengths)
 # Create x and y calibration variables
 
 x.cal <- df2[,5:length(df2)] # NIR data as the x variables
-y.cal <- df2[,3]             # Scan_type
+y.cal <- df2[,4]             # Scan_type
 
 #################################################################
 # Find optimal number of components for PLS
