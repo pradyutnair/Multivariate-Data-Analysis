@@ -1,3 +1,6 @@
+dirName <- dirname(rstudioapi::getSourceEditorContext()$path)
+setwd(dirName)
+############################################################
 library(pacman)
 pacman::p_load(caTools,tidyverse,caret,e1071,splitTools,ranger,mdatools)
 
@@ -8,7 +11,7 @@ df <- df[,-1]
 
 ############################################################
 # Split data into train and test sets
-base_sample <- partition(df$Freshness, p = c(train = 0.7, test = 0.3))
+base_sample <- partition(df$Freshness, p = c(train = 0.6, valid=0.2, test = 0.2))
 base_train <- df[base_sample$train, ]
 base_valid <- df[base_sample$valid, ]
 base_test <- df[base_sample$test, ]
@@ -41,8 +44,21 @@ y_om_test <- base_test[base_test$Scan_type == "OM",]$Freshness
 y_tb_test <- base_test[base_test$Scan_type == "TB",]$Freshness
 y_tp_test <- base_test[base_test$Scan_type == "TP",]$Freshness
 ############################################################
-# SVM on OM
-m <- tune.svm(x = X_om_train,y=y_om_train,
+# Baseline OM performance
+svm.om.base <- svm(X_om_train, y_om_train, type = "C-classification",
+                   kernel = "radial")
+
+om_train_preds <- predict(svm.om.base,newdata=data.frame(X_om_train))
+om_test_preds <- predict(svm.om.base,newdata=data.frame(X_om_test))
+
+# Accuracies
+print(paste0("SVM BASE accuracy on OM train set: ",
+             round(mean(om_train_preds==y_om_train),3)))
+print(paste0("SVM BASE accuracy on OM test set: ",
+             round(mean(om_test_preds==y_om_test),3)))
+############################################################
+# SVM tuning on OM validation set
+m <- tune.svm(x = X_om_valid,y=y_om_valid,
               tunecontrol=tune.control(cross=10),cost=1:3,gamma=seq(0,1,by=0.1))
 
 attributes(m)
@@ -50,6 +66,7 @@ m$performances
 m$best.model
 m$best.parameters
 
+# Retrain on training data with optimal parameters from validation set
 svm.om<- svm(formula = y_om_train ~ .,
              data = data.frame(X_om_train),
              gamma=m$best.parameters$gamma,
@@ -78,7 +95,7 @@ print(paste0("SVM Test OM Specificity: ",
              round(specificity(om_test_preds, y_om_test),3)))
 ############################################################
 # SVM on TB
-m <- tune.svm(x = X_tb_train,y=y_tb_train,
+m <- tune.svm(x = X_tb_valid,y=y_tb_valid,
               tunecontrol=tune.control(cross=10),cost=1:3,gamma=seq(0,1,by=0.1))
 
 m$best.model
@@ -113,7 +130,7 @@ print(paste0("SVM Test TB Specificity: ",
 
 ############################################################
 # SVM on TP
-m <- tune.svm(x = X_tp_train,y=y_tp_train,
+m <- tune.svm(x = X_tp_valid,y=y_tp_valid,
               tunecontrol=tune.control(cross=10),cost=1:3,gamma=seq(0,1,by=0.1))
 
 m$best.model
@@ -136,14 +153,14 @@ print(paste0("SVM accuracy on TP test set: ",
                 round(mean(tp_test_preds==y_tp_test),3)))
 
 # Sensitivity and specificity
-print(paste0("SVM Train TB Sensitivity: ",
+print(paste0("SVM Train TP Sensitivity: ",
              round(sensitivity(tp_train_preds, y_tp_train),3)))
-print(paste0("SVM Train TB Specificity: ",
+print(paste0("SVM Train TP Specificity: ",
              round(specificity(tp_train_preds, y_tp_train),3)))
 
-print(paste0("SVM Test TB Sensitivity: ",
+print(paste0("SVM Test TP Sensitivity: ",
              round(sensitivity(tp_test_preds, y_tp_test),3)))
-print(paste0("SVM Test TB Specificity: ",
+print(paste0("SVM Test TP Specificity: ",
              round(specificity(tp_test_preds, y_tp_test),3)))
 
 ############################################################
