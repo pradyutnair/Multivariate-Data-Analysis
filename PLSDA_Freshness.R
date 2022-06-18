@@ -45,30 +45,31 @@ y_tb_test <- base_test[base_test$Scan_type == "TB",]$Freshness
 y_tp_test <- base_test[base_test$Scan_type == "TP",]$Freshness
 
 ############################################################
-plsda.om <- plsda(X_om_train, y_om_train,cv=10)
-summary(plsda.om)
+plsda.om.train <- plsda(X_om_train, y_om_train,cv=10)
+summary(plsda.om.train)
 
-plsda.om <- plsda(X_om_valid, y_om_valid,cv=10)
-summary(plsda.om)
+plsda.om.valid <- plsda(X_om_valid, y_om_valid,cv=10)
+summary(plsda.om.valid )
 
 plsda.om <- plsda(X_om_test, y_om_test,cv=10)
-summary(plsda.om)
+predict(plsda.om.train, X_om_test)
+summary(plsda.om.test)
 ############################################################
-plsda.tb <- plsda(X_tb_train, y_tb_train,cv=10)
-summary(plsda.tb)
+plsda.tb.train <- plsda(X_tb_train, y_tb_train,cv=10)
+summary(plsda.tb.train)
 
-plsda.tb <- plsda(X_tb_valid, y_tb_valid,cv=10)
-summary(plsda.tb)
+plsda.tb.valid  <- plsda(X_tb_valid, y_tb_valid,cv=10)
+summary(plsda.tb.valid )
 
 plsda.tb <- plsda(X_tb_test, y_tb_test,cv=10)
 summary(plsda.tb)
 ############################################################
 
-plsda.tp <- plsda(X_tp_train, y_tp_train,cv=10)
-summary(plsda.tp)
+plsda.tp.train <- plsda(X_tp_train, y_tp_train,cv=10)
+summary(plsda.tp.train)
 
-plsda.tp <- plsda(X_tp_valid, y_tp_valid,cv=10)
-summary(plsda.tp)
+plsda.tp.valid  <- plsda(X_tp_valid, y_tp_valid,cv=10)
+summary(plsda.tp.valid )
 
 plsda.tp <- plsda(X_tp_test, y_tp_test,cv=10)
 summary(plsda.tp)

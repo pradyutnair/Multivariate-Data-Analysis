@@ -92,7 +92,8 @@ m <- tune.svm(x = X_om_valid,y=y_om_valid,
 
 m$best.model
 m$best.parameters
-
+attributes(m)
+m$performance
 # Retrain on training data with optimal parameters from validation set
 svm.om<- svm(formula = y_om_train ~ .,
              data = data.frame(X_om_train),
@@ -125,7 +126,7 @@ print(paste0("SVM Test OM Specificity: ",
 ############################################################
 # SVM on TB
 m <- tune.svm(x = X_tb_valid,y=y_tb_valid,
-              tunecontrol=tune.control(cross=10),cost=1:3,gamma=seq(0,1,by=0.1),kernel="polynomial",degree=2)
+              tunecontrol=tune.control(cross=10),cost=1:3,gamma=seq(0,1,by=0.1),kernel="polynomial",degree=2:4)
 
 
 m$best.model
@@ -146,7 +147,6 @@ print(paste0("SVM accuracy on TB train set: ",
              round(mean(tb_train_preds==y_tb_train),3)))
 print(paste0("SVM accuracy on TB test set: ",
              round(mean(tb_test_preds==y_tb_test),3)))
-
 # Sensitivity and specificity
 print(paste0("SVM Train TB Sensitivity: ",
              round(sensitivity(tb_train_preds, y_tb_train),3)))
