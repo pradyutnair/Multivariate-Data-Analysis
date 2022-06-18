@@ -14,14 +14,14 @@ tp_data <- df[df$Scan_type == "TP",]
 tptp_data <- df[(df$Scan_type == "TB") | (df$Scan_type == "TP"),]
 
 lda.om <- LinearDA(Data = om_data , classCol = "Freshness", selectedCols = 4:length(om_data),
-                   cvFraction = 0.6,cvType="folds",nTrainFolds=10,
+                   cvFraction = 0.7,cvType="folds",nTrainFolds=10,
                    extendedResults=TRUE,CV=TRUE)
 
 lda.om$ConfusionMatrixResults
 
 ############################################################
 lda.tb <- LinearDA(Data = tb_data , classCol = "Freshness", selectedCols = 4:length(tb_data),
-                   cvFraction = 0.6,cvType="folds",nTrainFolds=10,
+                   cvFraction = 0.7,cvType="folds",nTrainFolds=10,
                    extendedResults=TRUE,CV=TRUE)
 
 lda.tb$ConfusionMatrixResults
@@ -29,13 +29,13 @@ lda.tb$ConfusionMatrixResults
 ############################################################
 
 lda.tp <- LinearDA(Data = tp_data , classCol = "Freshness", selectedCols = 4:length(tp_data),
-                   cvFraction = 0.6,cvType="folds",nTrainFolds=10,
+                   cvFraction = 0.7,cvType="folds",nTrainFolds=10,
                    extendedResults=TRUE,CV=TRUE)
 
 lda.tp$ConfusionMatrixResults
 ############################################################
 lda.tptb <- LinearDA(Data = tptp_data , classCol = "Freshness", selectedCols = 4:length(tptp_data),
-                   cvFraction = 0.6,cvType="folds",nTrainFolds=10,
+                   cvFraction = 0.7,cvType="folds",nTrainFolds=10,
                    extendedResults=TRUE,CV=TRUE)
 
 lda.tptb$ConfusionMatrixResults

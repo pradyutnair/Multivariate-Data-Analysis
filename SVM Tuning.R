@@ -21,32 +21,41 @@ base_test <- df[base_sample$test, ]
 X_om_train <- base_train[base_train$Scan_type == "OM",][,5:length(base_train)]
 X_tb_train <- base_train[base_train$Scan_type == "TB",][,5:length(base_train)]
 X_tp_train <- base_train[base_train$Scan_type == "TP",][,5:length(base_train)]
+X_tptb_train <- base_train[base_train$Scan_type == "TP" | base_train$Scan_type == "TB",][,5:length(base_train)]
 
 y_om_train <- base_train[base_train$Scan_type == "OM",]$Freshness
 y_tb_train <- base_train[base_train$Scan_type == "TB",]$Freshness
 y_tp_train <- base_train[base_train$Scan_type == "TP",]$Freshness
+y_tptb_train <- base_train[base_train$Scan_type == "TP" | base_train$Scan_type == "TB",]$Freshness
+
 
 # Validation set
 X_om_valid <- base_valid[base_valid$Scan_type == "OM",][,5:length(base_valid)]
 X_tb_valid <- base_valid[base_valid$Scan_type == "TB",][,5:length(base_valid)]
 X_tp_valid <- base_valid[base_valid$Scan_type == "TP",][,5:length(base_valid)]
+X_tptb_valid <- base_valid[base_valid$Scan_type == "TP" | base_valid$Scan_type == "TB",][,5:length(base_valid)]
+
 
 y_om_valid <- base_valid[base_valid$Scan_type == "OM",]$Freshness
 y_tb_valid <- base_valid[base_valid$Scan_type == "TB",]$Freshness
 y_tp_valid <- base_valid[base_valid$Scan_type == "TP",]$Freshness
+y_tptb_valid <- base_valid[base_valid$Scan_type == "TP" | base_valid$Scan_type == "TB",]$Freshness
+
 
 # Test set
 X_om_test <- base_test[base_test$Scan_type == "OM",][,5:length(base_test)]
 X_tb_test <- base_test[base_test$Scan_type == "TB",][,5:length(base_test)]
 X_tp_test <- base_test[base_test$Scan_type == "TP",][,5:length(base_test)]
+X_tptb_test <- base_test[base_test$Scan_type == "TP" | base_test$Scan_type == "TB",][,5:length(base_test)]
+
 
 y_om_test <- base_test[base_test$Scan_type == "OM",]$Freshness
 y_tb_test <- base_test[base_test$Scan_type == "TB",]$Freshness
 y_tp_test <- base_test[base_test$Scan_type == "TP",]$Freshness
+y_tptb_test <- base_test[base_test$Scan_type == "TP" | base_test$Scan_type == "TB",]$Freshness
 
 ############################################################
 # Baseline performances
-# Radial kernel gives best performance on train data
 svm.om.base <- svm(X_om_train, y_om_train, type = "C-classification",
                    kernel = "polynomial", degree = 2)
 
@@ -83,7 +92,15 @@ print(paste0("SVM BASE accuracy on TP train set: ",
              round(mean(tp_train_preds==y_tp_train),3)))
 print(paste0("SVM BASE accuracy on TP test set: ",
              round(mean(tp_test_preds==y_tp_test),3)))
+svm.tptb.base <- svm(X_tptb_train, y_tptb_train, type = "C-classification",
+                     kernel = "polynomial", degree = 2)
+tptb_train_preds <- predict(svm.tptb.base,newdata=data.frame(X_tptb_train))
+tptb_test_preds <- predict(svm.tptb.base,newdata=data.frame(X_tptb_test))
 
+print(paste0("SVM BASE accuracy on TP/TB train set: ",
+             round(mean(tptb_train_preds==y_tptb_train),3)))
+print(paste0("SVM BASE accuracy on TP/TB test set: ",
+                round(mean(tptb_test_preds==y_tptb_test),3)))
 ############################################################
 # SVM tuning on OM validation set
 m <- tune.svm(x = X_om_valid,y=y_om_valid,
@@ -153,11 +170,6 @@ print(paste0("SVM Train TB Sensitivity: ",
 print(paste0("SVM Train TB Specificity: ",
              round(specificity(tb_train_preds, y_tb_train),3)))
 
-print(paste0("SVM Test TB Sensitivity: ",
-             round(sensitivity(tb_test_preds, y_tb_test),3)))
-print(paste0("SVM Test TB Specificity: ",
-             round(specificity(tb_test_preds, y_tb_test),3)))
-
 ############################################################
 # SVM on TP
 m <- tune.svm(x = X_tp_valid,y=y_tp_valid,
@@ -171,7 +183,7 @@ svm.tp <- svm(formula = y_tp_train ~ .,
              gamma=m$best.parameters$gamma,
              cost=m$best.parameters$cost,
              type = 'C-classification',
-             kernel = 'radial')
+              kernel = 'polynomial',degree=2)
 
 tp_train_preds <- predict(svm.tp,newdata=data.frame(X_tp_train))
 tp_test_preds <- predict(svm.tp,newdata=data.frame(X_tp_test))
@@ -193,5 +205,24 @@ print(paste0("SVM Test TP Sensitivity: ",
 print(paste0("SVM Test TP Specificity: ",
              round(specificity(tp_test_preds, y_tp_test),3)))
 
+############################################################
+# SVM on TP/TB
+m <- tune.svm(x = X_tptb_valid,y=y_tptb_valid,
+              tunecontrol=tune.control(cross=10),cost=1:3,gamma=seq(0,1,by=0.1))
+
+svm.tptb <- svm(formula = y_tptb_train ~ .,
+                data = data.frame(X_tptb_train),
+                gamma=m$best.parameters$gamma,
+                cost=m$best.parameters$cost,
+                type = 'C-classification',
+                kernel = 'polynomial',degree=2)
+
+tbtp_train_preds <- predict(svm.tptb,newdata=data.frame(X_tptb_train))
+tbtp_test_preds <- predict(svm.tptb,newdata=data.frame(X_tptb_test))
+
+print(paste0("SVM accuracy on TP/TB train set: ",
+             round(mean(tbtp_train_preds==y_tptb_train),3)))
+print(paste0("SVM accuracy on TP/TB test set: ",
+                round(mean(tbtp_test_preds==y_tptb_test),3)))
 ############################################################
 
