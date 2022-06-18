@@ -65,8 +65,8 @@ train.pca <- prcomp(train, center = TRUE, scale. = TRUE)
 test.pca <- prcomp(test, center = TRUE, scale. = TRUE)
 
 # Use the first two components as training data
-train.pca <- train.pca$x[,1:3]
-test.pca <- test.pca$x[,1:3]
+train.pca <- train.pca$x[,1:2]
+test.pca <- test.pca$x[,1:2]
 
 ########################################################################
 # First test SVM with baseline and PCA data
