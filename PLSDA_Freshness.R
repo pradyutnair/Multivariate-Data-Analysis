@@ -43,6 +43,7 @@ X_tp_test <- base_test[base_test$Scan_type == "TP",][,5:length(base_test)]
 y_om_test <- base_test[base_test$Scan_type == "OM",]$Freshness
 y_tb_test <- base_test[base_test$Scan_type == "TB",]$Freshness
 y_tp_test <- base_test[base_test$Scan_type == "TP",]$Freshness
+
 ############################################################
 plsda.om <- plsda(X_om_train, y_om_train,cv=10)
 summary(plsda.om)

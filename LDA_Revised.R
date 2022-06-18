@@ -1,4 +1,4 @@
-library(pacman)
+  library(pacman)
 pacman::p_load(tidyverse, PredPsych,splitTools, ranger)
 
 ############################################################
@@ -11,15 +11,16 @@ df <- df[,-1]
 om_data <- df[df$Scan_type == "OM",]
 tb_data <- df[df$Scan_type == "TB",]
 tp_data <- df[df$Scan_type == "TP",]
+tptp_data <- df[(df$Scan_type == "TB") | (df$Scan_type == "TP"),]
 
-lda.om <- LinearDA(Data = om_data , classCol = "Freshness", selectedCols = 4:length(df),
+lda.om <- LinearDA(Data = om_data , classCol = "Freshness", selectedCols = 4:length(om_data),
                    cvFraction = 0.7,cvType="folds",nTrainFolds=10,
                    extendedResults=TRUE,CV=TRUE)
 
 lda.om$ConfusionMatrixResults
 
 ############################################################
-lda.tb <- LinearDA(Data = tb_data , classCol = "Freshness", selectedCols = 4:length(df),
+lda.tb <- LinearDA(Data = tb_data , classCol = "Freshness", selectedCols = 4:length(tb_data),
                    cvFraction = 0.7,cvType="folds",nTrainFolds=10,
                    extendedResults=TRUE,CV=TRUE)
 
@@ -27,14 +28,18 @@ lda.tb$ConfusionMatrixResults
 
 ############################################################
 
-lda.tp <- LinearDA(Data = tp_data , classCol = "Freshness", selectedCols = 4:length(df),
+lda.tp <- LinearDA(Data = tp_data , classCol = "Freshness", selectedCols = 4:length(tp_data),
                    cvFraction = 0.7,cvType="folds",nTrainFolds=10,
                    extendedResults=TRUE,CV=TRUE)
 
 lda.tp$ConfusionMatrixResults
-
 ############################################################
+lda.tptb <- LinearDA(Data = tptp_data , classCol = "Freshness", selectedCols = 4:length(tptp_data),
+                   cvFraction = 0.7,cvType="folds",nTrainFolds=10,
+                   extendedResults=TRUE,CV=TRUE)
 
+lda.tptb$ConfusionMatrixResults
+############################################################
 data.om <- data.frame(cbind(seq(1:10),lda.om$accTestRun))
 ggplot(data=data.om,aes(x=X1, y=X2)) +
   geom_line(color="red")+ geom_point() + ggtitle("Accuracies across test folds for OM") +
@@ -48,11 +53,14 @@ data.tp <- data.frame(cbind(seq(1:10),lda.tp$accTestRun))
 ggplot(data=data.tp,aes(x=X1, y=X2)) +
     geom_line(color="blue")+ geom_point() + ggtitle("Accuracies across test folds for TP") +
     xlab("Fold") + ylab("Accuracy")
-
+data.tptb <- data.frame(cbind(seq(1:10),lda.tptb$accTestRun))
+ggplot(data=data.tptb,aes(x=X1, y=X2)) +
+    geom_line(color="orange")+ geom_point() + ggtitle("Accuracies across test folds for TP/TB") +
+    xlab("Fold") + ylab("Accuracy")
 
 #############################################################
 print(paste0("LDA test accuracy on OM: ",round(lda.om$accTest,3)))
 print(paste0("LDA test accuracy on TB: ",round(lda.tb$accTest,3)))
 print(paste0("LDA test accuracy on TP: ",round(lda.tp$accTest,3)))
-
+print(paste0("LDA test accuracy on TP/TB: ",round(lda.tptb$accTest,3)))
 #############################################################

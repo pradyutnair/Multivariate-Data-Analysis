@@ -8,6 +8,9 @@ pacman::p_load(caTools,tidyverse,caret,e1071,splitTools,ranger,mdatools)
 # Import data
 df <- read.csv('./NIR_Preprocessed.csv',sep=',',stringsAsFactors=TRUE,strip.white = TRUE)
 df <- df[,-1]
+# Use only TB-TP Data
+tbtp.df <- df[(df$Scan_type == "TB") | (df$Scan_type == "TP"),]
+df <- tbtp.df
 
 ############################################################
 # Split data into train and test sets
@@ -18,48 +21,28 @@ base_test <- df[base_sample$test, ]
 
 ############################################################
 # Train set
-X_om_train <- base_train[base_train$Scan_type == "OM",][,5:length(base_train)]
 X_tb_train <- base_train[base_train$Scan_type == "TB",][,5:length(base_train)]
 X_tp_train <- base_train[base_train$Scan_type == "TP",][,5:length(base_train)]
 
-y_om_train <- base_train[base_train$Scan_type == "OM",]$Freshness
 y_tb_train <- base_train[base_train$Scan_type == "TB",]$Freshness
 y_tp_train <- base_train[base_train$Scan_type == "TP",]$Freshness
 
 # Validation set
-X_om_valid <- base_valid[base_valid$Scan_type == "OM",][,5:length(base_valid)]
 X_tb_valid <- base_valid[base_valid$Scan_type == "TB",][,5:length(base_valid)]
 X_tp_valid <- base_valid[base_valid$Scan_type == "TP",][,5:length(base_valid)]
 
-y_om_valid <- base_valid[base_valid$Scan_type == "OM",]$Freshness
 y_tb_valid <- base_valid[base_valid$Scan_type == "TB",]$Freshness
 y_tp_valid <- base_valid[base_valid$Scan_type == "TP",]$Freshness
 
 # Test set
-X_om_test <- base_test[base_test$Scan_type == "OM",][,5:length(base_test)]
 X_tb_test <- base_test[base_test$Scan_type == "TB",][,5:length(base_test)]
 X_tp_test <- base_test[base_test$Scan_type == "TP",][,5:length(base_test)]
 
-y_om_test <- base_test[base_test$Scan_type == "OM",]$Freshness
 y_tb_test <- base_test[base_test$Scan_type == "TB",]$Freshness
 y_tp_test <- base_test[base_test$Scan_type == "TP",]$Freshness
 
 ############################################################
 # Baseline performances
-# Radial kernel gives best performance on train data
-svm.om.base <- svm(X_om_train, y_om_train, type = "C-classification",
-                   kernel = "polynomial", degree = 2)
-
-om_train_preds <- predict(svm.om.base,newdata=data.frame(X_om_train))
-om_test_preds <- predict(svm.om.base,newdata=data.frame(X_om_test))
-
-# Accuracies
-print(paste0("SVM BASE accuracy on OM train set: ",
-             round(mean(om_train_preds==y_om_train),3)))
-print(paste0("SVM BASE accuracy on OM test set: ",
-             round(mean(om_test_preds==y_om_test),3)))
-
-
 svm.tb.base <- svm(X_tb_train, y_tb_train, type = "C-classification",
                    kernel = "polynomial", degree = 2)
 
@@ -83,44 +66,6 @@ print(paste0("SVM BASE accuracy on TP train set: ",
              round(mean(tp_train_preds==y_tp_train),3)))
 print(paste0("SVM BASE accuracy on TP test set: ",
              round(mean(tp_test_preds==y_tp_test),3)))
-
-############################################################
-# SVM tuning on OM validation set
-m <- tune.svm(x = X_om_valid,y=y_om_valid,
-              tunecontrol=tune.control(cross=10),cost=1:3,gamma=seq(0,1,by=0.1),
-              kernel="polynomial",degree=2)
-
-m$best.model
-m$best.parameters
-
-# Retrain on training data with optimal parameters from validation set
-svm.om<- svm(formula = y_om_train ~ .,
-             data = data.frame(X_om_train),
-             gamma=m$best.parameters$gamma,
-             cost=m$best.parameters$cost,
-             type = 'C-classification',
-             kernel = 'polynomial',degree=2)
-
-om_train_preds <- predict(svm.om,newdata=data.frame(X_om_train))
-om_test_preds <- predict(svm.om,newdata=data.frame(X_om_test))
-
-# Accuracies
-print(paste0("SVM accuracy on OM train set: ",
-             round(mean(om_train_preds==y_om_train),3)))
-
-print(paste0("SVM accuracy on OM test set: ",
-             round(mean(om_test_preds==y_om_test),3)))
-
-# Sensitivity and specificity
-print(paste0("SVM Train OM Sensitivity: ",
-             round(sensitivity(om_train_preds, y_om_train),3)))
-print(paste0("SVM Train OM Specificity: ",
-             round(specificity(om_train_preds, y_om_train),3)))
-
-print(paste0("SVM Test OM Sensitivity: ",
-             round(sensitivity(om_test_preds, y_om_test),3)))
-print(paste0("SVM Test OM Specificity: ",
-             round(specificity(om_test_preds, y_om_test),3)))
 
 ############################################################
 # SVM on TB
