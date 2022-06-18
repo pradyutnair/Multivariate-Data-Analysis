@@ -4,12 +4,8 @@ pacman::p_load(dplyr,MASS,ggplot2,openxlsx, factoextra, tidyverse, plotly,ggpubr
 
 # Import the data and create dataframe
 setwd('./')
-df <- data.frame(read.csv('../GitHub/Chicken Fillet NIR data.csv',
-                          strip.white = TRUE,
-                          sep=';',
-                          stringsAsFactors = TRUE))
 
-df <- read.csv('../Assignment 1/NIR_SNV_MSC.csv', sep=',', stringsAsFactors=TRUE, strip.white = TRUE)
+df <- read.csv('./NIR_SNV_MSC.csv', sep=',', stringsAsFactors=TRUE, strip.white = TRUE)
 df <- df[,-1]
 
 # Remove row 455 as it is most likely a measurement error
@@ -19,7 +15,7 @@ thawed <- df[df$Freshness == "TH",]
 
 
 # PCA of entire df
-df.pca <- prcomp(df[,5:length(df)], center=TRUE, scale = TRUE)
+df.pca <- prcomp(df[,5:length(df)])
 summary(df.pca)
 fviz_eig(df.pca, addlabels = TRUE, ylim = c(0, 80))
 ind <- get_pca_ind(df.pca)
