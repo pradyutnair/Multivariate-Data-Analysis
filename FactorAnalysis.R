@@ -1,4 +1,5 @@
 NIR <- NIR_Preprocessed
+NIR <- NIR_Preprocessed
 
 library(psych)
 library(corrplot)
@@ -11,7 +12,6 @@ corrplot(datamatrix, method="number")
 
 X <- NIR[6:130]
 Y <- NIR[2:5]
-unique(Y$Production_system)
 
 KMO(r=cor(X))
 cortest.bartlett(X)
@@ -34,7 +34,7 @@ parallel <- fa.parallel(X)
 
 
 fa.none <- fa(r=X, 
-              nfactors = 6, 
+              nfactors = 7, 
               # covar = FALSE, SMC = TRUE,
               fm="pa", # type of factor analysis we want to use ("pa" is principal axis factoring)
               max.iter=100, # (50 is the default, but we have changed it to 100
@@ -45,31 +45,35 @@ fa.diagram(fa.none)
 
 head(fa.none$scores)
 
-unique(Y$Production_system)
-
 
 Y <- NIR[2:5]
-Y["Production_system"][Y["Production_system"]=="1 Star"] <- 10
-Y["Production_system"][Y["Production_system"]=="2 stars"] <- 20
-Y["Production_system"][Y["Production_system"]=="CONV"] <- 30
-Y["Production_system"][Y["Production_system"]=="ORG"] <- 40
-Y["Production_system"][Y["Production_system"]=="STD"] <- 50
-Y["Production_system"][Y["Production_system"]=="FR"] <- 60
-Y["Production_system"][Y["Production_system"]=="CF"] <- 70
-Y["Production_system"][Y["Production_system"]=="MAR"] <- 80
-Y
+#Y["Production_system"][Y["Production_system"]=="1 Star"] <- 10
+#Y["Production_system"][Y["Production_system"]=="2 stars"] <- 20
+#Y["Production_system"][Y["Production_system"]=="CONV"] <- 30
+#Y["Production_system"][Y["Production_system"]=="ORG"] <- 40
+#Y["Production_system"][Y["Production_system"]=="STD"] <- 50
+#Y["Production_system"][Y["Production_system"]=="FR"] <- 60
+#Y["Production_system"][Y["Production_system"]=="CF"] <- 70
+#Y["Production_system"][Y["Production_system"]=="MAR"] <- 80
+
+Y["Freshness"][Y["Freshness"]=="FR"] <- 0
+Y["Freshness"][Y["Freshness"]=="TH"] <- 1
+
+#Y
 #rapply(num_Ps, function(x) func(x), how = "replace")
 
-Y["Production_system"]
-fa.none$scores[,"PA3"]
+#Y["Production_system"]
+#Y["Freshness"]
+#fa.none$scores[,"PA3"]
 
-regdata <- data.frame (first_column  = Y["Production_system"], 
+regdata <- data.frame (first_column  = Y["Freshness"], 
                   PA3 = fa.none$scores[,"PA3"],
                   PA1 = fa.none$scores[,"PA1"],
                   PA2 = fa.none$scores[,"PA2"],
                   PA4 = fa.none$scores[,"PA4"],
                   PA5 = fa.none$scores[,"PA5"],
-                  PA6 = fa.none$scores[,"PA6"]
+                  PA6 = fa.none$scores[,"PA6"],
+                  PA7 = fa.none$scores[,"PA7"]
 )
 regdata
 
@@ -84,17 +88,14 @@ indices= sample(1:nrow(regdata), 0.7*nrow(regdata))
 train=regdata[indices,]
 test = regdata[-indices,]
 
-model.fa.score = lm(Production_system~., data = train)
+model.fa.score = lm(Freshness~., data = train)
 summary(model.fa.score)
 
 vif(model.fa.score)
 
 pred_test <- predict(model.fa.score, newdata = test, type = "response")
 pred_test
-test$Production_system_pred <- signif(pred_test, digits = -1)#round(pred_test, digits = 0)
-head(test[c("Production_system","Production_system_pred")], 100)
-typeof(test)
-
-typeof(test)
-table(test[,"Production_system"] == test[, "Production_system_pred"])
-243/(973+243)
+test$Freshness_pred <- round(pred_test, digits = 0)#signif(pred_test, digits = 0)#round(pred_test, digits = 0)
+head(test[c("Freshness","Freshness_pred")], 100)
+table(test[,"Freshness"] == test[, "Freshness_pred"])
+738/(478+738)
