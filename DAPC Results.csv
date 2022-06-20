@@ -1,0 +1,16 @@
+﻿Dataset,Accuracy Type,Accuracy
+BASE,Train Accuracy,0.556
+BASE,Validation Accuracy,0.554
+BASE,Test Accuracy,0.557
+OM,Train Accuracy,0.589
+OM,Validation Accuracy,0.578
+OM,Test Accuracy,0.617
+TB,Train Accuracy,0.635
+TB,Validation Accuracy,0.548
+TB,Test Accuracy,0.602
+TP,Train Accuracy,0.575
+TP,Validation Accuracy,0.584
+TP,Test Accuracy,0.58
+TP/TB,Train Accuracy,0.572
+TP/TB,Validation Accuracy,0.564
+TP/TB,Test Accuracy,0.556

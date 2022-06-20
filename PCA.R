@@ -1,3 +1,6 @@
+dirName <- dirname(rstudioapi::getSourceEditorContext()$path)
+setwd(dirName)
+############################################################
 library(pacman)
 pacman::p_load(dplyr,MASS,ggplot2,openxlsx, factoextra, tidyverse, plotly,ggpubr,reshape2,Hmisc,
                cowplot, PerformanceAnalytics,signal, caTools, randomForest,e1071)
@@ -43,7 +46,7 @@ fviz_contrib(df.pca, choice = "var", axes = 1, top = 50,fill="blue",col="black")
 # Contributions of wavelengths to PC2
 fviz_contrib(df.pca, choice = "var", axes = 2, top = 50,fill="orange",col="black")
 
-
+shabab
 
 ########################################################################
 # Create train and test sets
