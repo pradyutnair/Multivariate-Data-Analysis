@@ -11,7 +11,7 @@ df <- df[,-1]
 
 ############################################################
 # Split data into train and test sets
-base_sample <- partition(df$Freshness, p = c(train = 0.6, valid=0.2, test = 0.2))
+base_sample <- partition(df$Freshness, p = c(train = 0.7, valid=0.1, test = 0.2))
 base_train <- df[base_sample$train, ]
 base_valid <- df[base_sample$valid, ]
 base_test <- df[base_sample$test, ]
@@ -45,13 +45,22 @@ y_tb_test <- base_test[base_test$Scan_type == "TB",]$Freshness
 y_tp_test <- base_test[base_test$Scan_type == "TP",]$Freshness
 
 ############################################################
+plsda.base.train <- plsda(base_train[,5:length(base_train)],base_train$Freshness,cv=10)
+summary(plsda.base)
+
+plsda.base.valid <- plsda(base_valid[,5:length(base_valid)],base_valid$Freshness,cv=10)
+summary(plsda.base)
+
+plsda.base.test <- plsda(base_test[,5:length(base_test)],base_test$Freshness,cv=10)
+summary(plsda.base)
+############################################################
 plsda.om.train <- plsda(X_om_train, y_om_train,cv=10)
 summary(plsda.om.train)
 
 plsda.om.valid <- plsda(X_om_valid, y_om_valid,cv=10)
 summary(plsda.om.valid )
 
-plsda.om <- plsda(X_om_test, y_om_test,cv=10)
+plsda.om.test <- plsda(X_om_test, y_om_test,cv=10)
 predict(plsda.om.train, X_om_test)
 summary(plsda.om.test)
 ############################################################
@@ -61,7 +70,7 @@ summary(plsda.tb.train)
 plsda.tb.valid  <- plsda(X_tb_valid, y_tb_valid,cv=10)
 summary(plsda.tb.valid )
 
-plsda.tb <- plsda(X_tb_test, y_tb_test,cv=10)
+plsda.tb.test <- plsda(X_tb_test, y_tb_test,cv=10)
 summary(plsda.tb)
 ############################################################
 
@@ -71,8 +80,8 @@ summary(plsda.tp.train)
 plsda.tp.valid  <- plsda(X_tp_valid, y_tp_valid,cv=10)
 summary(plsda.tp.valid )
 
-plsda.tp <- plsda(X_tp_test, y_tp_test,cv=10)
-summary(plsda.tp)
+plsda.tp.test <- plsda(X_tp_test, y_tp_test,cv=10)
+summary(plsda.tp.test)
 
 ############################################################
 
