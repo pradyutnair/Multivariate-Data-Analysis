@@ -1,5 +1,5 @@
 library(pacman)
-pacman::p_load(tidyverse,mdatools)
+pacman::p_load(tidyverse,mdatools,signal,pavo)
 set.seed(123)
 dirName = dirname(rstudioapi::getSourceEditorContext()$path)
 setwd(dirName)
