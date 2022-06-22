@@ -66,6 +66,7 @@ print(paste0("LDA train accuracy on OM: ",round(lda.om$accTest,3)))
 print(paste0("LDA train accuracy on TB: ",round(lda.tb$accTest,3)))
 print(paste0("LDA train accuracy on TP: ",round(lda.tp$accTest,3)))
 print(paste0("LDA train accuracy on TP/TB: ",round(lda.tptb$accTest,3)))
+shabab
 #############################################################
 ############################################################
 # Split data into train and test sets
